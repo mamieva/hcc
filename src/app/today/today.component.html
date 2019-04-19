@@ -1,0 +1,275 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">today</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">Hoy</h4>
+                        <div>
+                            <div class="col-xs-6">
+                                <div class="col-xs-12">
+                                    <div class="card">
+                                        <div class="card-content">
+                                            <h4 class="card-title">Paciente</h4>
+                                            <div *ngIf="!patience">
+                                                <div class="form-group label-floating col-md-6" style="margin-top: 0px;">
+                                                    <label class="control-label">Número de Documento</label>
+                                                    <input type="text" [(ngModel)]="documentNumber" class="form-control doc-number">
+                                                </div>
+                                                <div class="radio col-md-3">
+                                                    <label>
+                                                        <input type="radio" name="sex" value="M" [(ngModel)]="sex">
+                                                        Masculino
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio" name="sex" value="F" [(ngModel)]="sex">
+                                                        Femenino
+                                                    </label>
+                                                </div>
+                                                <button type="submit" class="btn btn-white btn-round btn-just-icon col-md-1"
+                                                    (click)="findPerson()">
+                                                    <i class="material-icons">search</i>
+                                                    <div class="ripple-container"></div>
+                                                </button>
+                                            </div>
+                                            <div *ngIf="patience" class="row" style="display: inline;">
+                                                <div class="photo col-xs-2">
+                                                    <img [src]="'data:image;base64,' + patience.photoBase64 | todaySafeHtml" />
+                                                </div>
+                                                <div class="col-xs-9">{{patience.lastName}}, {{patience.firstName}}
+                                                    <br />DU: {{patience.docNumber}}
+                                                    <br />{{patience.age}}</div>
+                                                <i class="material-icons col-xs-1" style="float: right; cursor: pointer;"
+                                                    (click)="closePatience('')">close</i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="col-xs-12">
+                                    <div class="card">
+                                        <div class="card-content">
+                                            <h4 class="card-title">Servicio</h4>
+                                            <div *ngIf="!service">
+                                                <!-- <div class="form-group col-md-10" style="margin-top: 0px;">
+                                                    <input ngui-auto-complete [(ngModel)]="model4" placeholder="Ingrese nombre de servicio (mínimo 2 letras)" list-formatter="formatted_address"
+                                                        path-to-data="results" min-chars="2" class="form-control" (keyup.enter)="findService()"
+                                                    />
+                                                </div>
+                                                <button type="submit" class="btn btn-white btn-round btn-just-icon col-md-1" (click)="findService()">
+                                                    <i class="material-icons">search</i>
+                                                    <div class="ripple-container"></div>
+                                                </button> -->
+                                                <div class="form-group col-md-10" style="margin-top: 0px;">
+                                                    <md-form-field class="example-full-width" style="width: 90%">
+                                                        <input mdInput placeholder="Servicio" aria-label="Servicio"
+                                                            [mdAutocomplete]="auto" [formControl]="serviceCtrl" name="services"
+                                                            id="services" (keyup.enter)="findService()" [(ngModel)]="today.service">
+                                                        <md-autocomplete #auto="mdAutocomplete" [displayWith]="displayFn.bind(this)">
+                                                            <md-option ngClass="simple mat-select-content" *ngFor="let service of filteredServices | async"
+                                                                [value]="service" style="width: 90%; text-align: left;">
+                                                                <span style="float: left;font-size: 11.5px;">{{service.name
+                                                                    }}
+                                                                </span>
+                                                            </md-option>
+                                                        </md-autocomplete>
+                                                    </md-form-field>
+                                                </div>
+                                                <button type="submit" class="btn btn-white btn-round btn-just-icon col-md-1"
+                                                    (click)="findService()">
+                                                    <i class="material-icons">search</i>
+                                                    <div class="ripple-container"></div>
+                                                </button>
+
+                                            </div>
+                                            <div *ngIf="service" class="row" style="display: inline;">
+                                                <div class="col-xs-9">{{service.name}}
+                                                    <br />Duración de Turno: {{service.duration}}</div>
+                                                <i class="material-icons col-xs-1" style="float: right; cursor: pointer;"
+                                                    (click)="closeService('')">close</i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="float: right;" *ngIf="searchResult.page && searchResult.page.totalElements > 0">
+                            {{getPagingInfo()}} &nbsp;
+                            <div (click)="moveToPage(-1)" class="aprevnext">&#8249;</div>
+                            <div (click)="moveToPage(1)" class="aprevnext">&#8250;</div>
+                        </div>
+                        <span style="color: rgba(85, 85, 85, 0.829)">Se actualiza en
+                            <b>{{timerSeconds}}</b> seg.</span>
+                        <table class="table table-hover">
+                            <thead>
+                                <th>Hora</th>
+                                <th>Documento</th>
+                                <th>Paciente</th>
+                                <th>Servicio</th>
+                                <th>Consulta</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of searchResultFiltered.content; let i = index;">
+                                    <td>{{getScheduleTime(row)}}</td>
+                                    <td>{{row.person ? row.person.docNumber : ''}}</td>
+                                    <td>{{row.person ? row.person.lastName + ', ' + row.person.firstName : ''}}</td>
+                                    <td>{{row.service ? row.service.name : ''}}</td>
+                                    <td>{{row.status == 'FIN' ? 'Firmada' : 'Sin Firmar'}}</td>
+                                    <td>{{row.statusLabel | titlecase}}</td>
+                                    <!-- <td>{{getStatus(row)}}</td> -->
+                                    <td style="cursor: pointer;">
+                                        <i title="Iniciar Consulta" class="material-icons" *ngIf="['En Espera'].includes(getStatus(row)) && operator.isProfessional"
+                                            (click)="moveToConsultation(row)">assignment
+                                            <span class="tooltiptext">Iniciar Consulta</span>
+                                        </i>
+                                        <i title="Iniciar Consulta" class="material-icons" *ngIf="['En Consulta'].includes(getStatus(row)) && operator.isProfessional"
+                                            (click)="moveToConsultation(row)" style="color: rgba(37, 179, 204, 0.918)">assignment
+                                            <span class="tooltiptext">Retomar Consulta</span>
+                                        </i>
+                                        <i class="material-icons" *ngIf="['Pendiente', 'Demanda', 'Sobreturno'].includes(getStatus(row)) && !row.service.telemedicine"
+                                            (click)="moveToWaitingStatus(row,i)">touch_app
+                                            <span class="tooltiptext">Sala de Espera</span>
+                                        </i>
+                                        <i class="material-icons" *ngIf="healthCenterHasOperator.healthCenter.isPublic != '1'"
+                                            (click)="generateOrder(row);">attach_money
+                                            <span class="tooltiptext">Cobrar Consulta</span>
+                                        </i>
+                                        <i class="material-icons" *ngIf="['Pendiente', 'Demanda', 'En Espera', 'Sobreturno'].includes(getStatus(row))"
+                                            (click)="cancelSchedule(row)">cancel
+                                            <span class="tooltiptext">Cancelar</span>
+                                        </i>
+                                        <i class="material-icons" *ngIf="['En Consulta','Finalizado'].includes(getStatus(row)) && interconsultShow"
+                                            data-dismiss="modal" data-toggle="modal" data-target="#modalInterconsultation"
+                                            (click)="demandInterconsultation(row)" style="color: rgb(89, 182, 89)">info_outline
+                                            <span class="tooltiptext">Sol. Interconsulta</span>
+                                        </i>
+                                        <i class="material-icons" *ngIf="['En Consulta','Finalizado','Cancelado'].includes(getStatus(row)) && row.scheduledType != 'INT' "
+                                            data-dismiss="modal" data-toggle="modal" data-target="#modalReprogramation"
+                                            (click)="openReproSchedule(row)" style="color: #ff9800">timer
+                                            <span class="tooltiptext">Reprogramar Turno</span>
+                                        </i>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="!searchResultFiltered.content || searchResultFiltered.content.length == 0"
+                                    style="text-align: center;">
+                                    <td colspan="6">No se encontraron turnos</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalInterconsultation" tabindex="-1" role="dialog" aria-labelledby="modalInterconsultationTitle"
+                aria-hidden="true">
+                <div *ngIf="modelInterconsultation.professional" class="modal-dialog" role="document" style="width:700px">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Solicitud Turno de Inter-consulta
+                                <strong></strong>
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            El Dr/a :
+                            <b>{{modelInterconsultation.professional.person.lastName + ', '
+                                +modelInterconsultation.professional.person.firstName}}</b>
+                            - Matricula:
+                            <b>{{modelInterconsultation.professional.matricula}}</b>
+                            <br>Solicita una inter-consulta para el paciente:
+                            <b>{{modelInterconsultation.person.lastName + ', ' +
+                                modelInterconsultation.person.firstName}}</b>
+                            - DU:
+                            <b>{{modelInterconsultation.person.docNumber}}</b>
+                            <br>
+                            <div class="form-group" style="margin: 5px 0 0 0">
+                                <label for="services">Para el siguiente Servicio:</label>
+                                <select placeholder="Prioridad" class="form-control" id="services" [(ngModel)]="modelInterconsultation.remoteService"
+                                    (ngModelChange)="changeServiceInterconsult($event)">
+                                    <option [ngValue]="null" selected>
+                                        Seleccione un Valor
+                                    </option>
+                                    <option *ngFor="let speciality of interconsultationsList" [ngValue]="speciality">
+                                        {{ speciality.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin: 5px 0 0 0">
+                                <label for="priority">Con la siguiente Prioridad: </label>
+                                <select placeholder="Prioridad" class="form-control" id="priority" [(ngModel)]="modelInterconsultation.priority">
+                                    <option value="1">Alta</option>
+                                    <option value="2">Normal</option>
+                                    <option value="3">Baja</option>
+                                </select>
+                            </div>
+                            <div class="form-group checkbox" style="margin: 5px 0 0 0">
+                                <label>
+                                    <input type="checkbox" disabled name="optionsCheckboxes" [(ngModel)]="modelInterconsultation.telemedicine">
+                                    Telemedicina
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            <button type="button" [disabled]="!modelInterconsultation.remoteService.id" class="btn btn-primary"
+                                data-dismiss="modal" (click)="addDemandInterconsultation()">Aceptar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- !!!! -->
+            <div class="modal fade" data-backdrop="true" id="modalReprogramation" tabindex="-1" role="dialog"
+                aria-labelledby="modalReprogramation" aria-hidden="true">
+                <div *ngIf="reproSchedule && reproSchedule.person" class="modal-dialog" role="document" style="width:700px">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Reprogramación de Turno
+                                <strong></strong>
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            Se reprograma un turno para el Paciente:
+                            <b>{{reproSchedule.person.lastName + ', ' + reproSchedule.person.firstName}}</b>
+                            - DU:
+                            <b>{{reproSchedule.person.docNumber}}</b>
+                            <br>
+                            <div class="form-group" style="margin: 5px 0 0 0">
+                                <label for="priority">Fecha y Horario:</label>
+                                <select placeholder="Prioridad" class="form-control" id="priority" [(ngModel)]="reproSchedule.id">
+                                    <option value="" selected> - SELECCIONE UN VALOR - </option>
+                                    <option *ngFor="let future of futureSchedules" [value]="future.id">
+                                        {{future.scheduledDateFrom}}
+                                    </option>
+                                </select>
+                            </div>
+                            <!--
+                            <div class="form-group" style="margin: 5px 0 0 0">
+                                <label for="priority">Con la siguiente Prioridad: </label>
+                                <select placeholder="Prioridad" class="form-control" id="priority" [(ngModel)]="modelInterconsultation.priority">
+                                    <option value="1">Alta</option>
+                                    <option value="2">Normal</option>
+                                    <option value="3">Baja</option>
+                                </select>
+                            </div>
+                            <div class="form-group checkbox" style="margin: 5px 0 0 0">
+                                <label>
+                                    <input type="checkbox" name="optionsCheckboxes" [(ngModel)]="modelInterconsultation.telemedicine"> Telemedicina
+                                </label>
+                            </div> -->
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" (click)="addReproSchedule()">Aceptar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

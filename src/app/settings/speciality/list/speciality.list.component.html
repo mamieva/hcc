@@ -1,0 +1,35 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                            <i class="material-icons">local_hospital</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">{{title}}</h4>
+                        <button type="submit" class="btn btn-white btn-round btn-just-icon" (click)="showSearchInput = !showSearchInput">
+                            <i class="material-icons">search</i>
+                            <div class="ripple-container"></div>
+                        </button>
+                        &nbsp;&nbsp;
+                        <!-- <button class="btn btn-primary" (click)="newCenter()">Nueva Especialidad</button> -->
+                        <div style="margin-top: 0px;" *ngIf="showSearchInput">
+                            <input placeholder="Buscar..." class="form-control" name="search" [(ngModel)]="model.search" #search="ngModel" size="50" (keydown)="doSearch($event)">
+                        </div>
+                        <table class="table table-hover">
+                            <thead>
+                                <th>Especialidad</th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of filteredList" (click)="openRow(row.id)" style="cursor: pointer;">
+                                    <td>{{row.name}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

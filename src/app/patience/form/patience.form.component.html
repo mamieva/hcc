@@ -1,0 +1,719 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card" *ngIf="patience">
+                    <div class="card-header">
+                        <h4 *ngIf="patience.id" class="title">{{title}}{{patience.lastName + ', ' + patience.firstName}}</h4>
+                        <h4 *ngIf="!patience.id" class="title">{{title}}</h4>
+                        <p class="category"></p>
+                        <div *ngIf="patience.id" class="photo col-xs-2">
+                            <img [src]="'data:image;base64,' + patience.photoBase64 | patienceSafeHtml" />
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <i class="material-icons" style="float: right; cursor: pointer;" (click)="close()">close</i>
+                        <form (ngSubmit)="onSubmit()" #modelForm="ngForm">
+                            <ul class="dynform">
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="firstName" class="control-label">Nombres</label>
+                                        <input [disabled]="patience.id" type="text" id="firstName" name="firstName" [(ngModel)]="patience.firstName" #firstName="ngModel"
+                                            class="form-control" size="65" required>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="lastName" class="control-label">Apellido</label>
+                                        <input [disabled]="patience.id" type="text" id="lastName" name="lastName" [(ngModel)]="patience.lastName" #lastName="ngModel"
+                                            class="form-control" size="65" required>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <!-- <label for="name" class="control-label">Documento</label>
+                                        <span>{{patience.documentType}}{{' ' + patience.docNumber}}</span> -->
+                                        <!-- <div class="form-group form-black is-empty" [class.label-floating]="!patience" style="display: inline-block;"> -->
+                                        <!-- <md-select [color]="selectTheme" id="documentType" name="documentType" [(ngModel)]="patience.documentType" #documentTyp="ngModel"
+                                                placeholder="Seleccionar" ngClass="btn btn-primary btn-round simple">
+                                                <md-option value="DU">
+                                                    DU
+                                                </md-option>
+                                            </md-select> -->
+                                        <!-- </div> -->
+                                        <label for="docNumber" class="control-label">Nº Documento</label>
+                                        <input [disabled]="patience.id" type="text" id="docNumber" name="docNumber" [(ngModel)]="patience.docNumber" #docNumber="ngModel"
+                                            class="form-control" size="65" required>
+                                    </div>
+                                </li>
+                                <li>
+                                </li>
+                                <!-- <div class="form-group form-black is-empty label-floating col-md-12" style="display: inline-block;"> -->
+                                <md-form-field>
+                                    <input readonly mdInput [mdDatepicker]="picker" id="birthDayDate" name="birthDayDate" [min]="minDate" [max]="maxDate" [(ngModel)]="birthDayDate"
+                                        placeholder="Fecha de Nacimiento" required>
+                                    <md-datepicker-toggle [disabled]="patience.id" mdSuffix [for]="picker"></md-datepicker-toggle>
+                                    <md-datepicker [disabled]="patience.id" #picker startView="year" [startAt]="patience.birthDayDate"></md-datepicker>
+                                </md-form-field>
+                                <!-- </div> -->
+                                <li class="form-row">
+                                    <!-- <div class="form-group form-black is-empty"style="display: inline-block;">
+                                        <label for="name" class="control-label">Sexo</label>
+                                        <span>{{patience.sex == 'M' ? 'Masculino' : 'Femenino' }}</span>
+                                    </div> -->
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="sex" value="M" [(ngModel)]="patience.sex"> Masculino
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="sex" value="F" [(ngModel)]="patience.sex"> Femenino
+                                        </label>
+                                    </div>
+                                </li>
+                                <li class="form-row" *ngIf="patience.age">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="name" class="control-label">Edad</label>
+                                        <span>{{patience.age}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <!-- <label for="name" class="control-label">Domicilio</label>
+                                        <span>{{patience.street + ' ' + patience.addressNumber + ', ' + patience.neighborhood + ', CP ' + patience.postalCode}}</span> -->
+                                        <label for="street" class="control-label">Calle</label>
+                                        <input type="text" id="street" name="street" [(ngModel)]="patience.street" #street="ngModel" class="form-control" size="65"
+                                            required>
+                                        <label for="addressNumber" class="control-label">Nº</label>
+                                        <input type="text" id="addressNumber" name="addressNumber" [(ngModel)]="patience.addressNumber" #addressNumber="ngModel"
+                                            class="form-control" size="65" required>
+                                        <label for="neighborhood" class="control-label">Barrio</label>
+                                        <input type="text" id="neighborhood" name="neighborhood" [(ngModel)]="patience.neighborhood" #neighborhood="ngModel" class="form-control"
+                                            size="65" required>
+                                    </div>
+                                    <div class="form-group form-black is-empty">
+                                        <md-select [color]="selectTheme" id="country" name="country" [(ngModel)]="patience.country.id" #country="ngModel" placeholder="País"
+                                            class="mat-select-content">
+                                            <md-option *ngFor="let country of countries" [value]="country.id">
+                                                {{country.name}}
+                                            </md-option>
+                                        </md-select>
+                                    </div>
+                                </li>
+                                <!-- <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;"> -->
+                                <!-- <label for="name" class="control-label">Fecha de Nacimiento</label>
+                                        <span>{{patience.birthDay}}</span> -->
+                                <!-- <label for="birthDay" class="control-label">Fecha de Nacimiento</label>
+                                        <input type="text" id="birthDay" name="birthDay" [(ngModel)]="patience.birthDay" #birthDay="ngModel" class="form-control"
+                                            size="65" renuired>
+                                    </div>
+                                </li> -->
+                                <li class="form-row" *ngIf="patience.csn">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="csn" class="control-label">¿Tiene CIPE?</label>
+                                        <span>{{patience.csn ? 'SI' : 'NO'}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row" *ngIf="patience.socialSecurity">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="descOs" class="control-label">Obra Social</label>
+                                        <span *ngIf="patience.socialSecurity">{{patience.socialSecurity.descOs}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row" *ngIf="patience.allergies">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="allergies" class="control-label">Alergias</label>
+                                        <span>{{patience.allergies}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!patience.email " style="display: inline-block;">
+                                        <label for="email" class="control-label">E-mail</label>
+                                        <input email type="email" id="email" name="email" [(ngModel)]="patience.email" #email="ngModel" class="form-control" size="65"
+                                            required>
+                                        <!-- <div *ngIf="schedule.invalid && (schedule.dirty || schedule.touched)" class="alert alert-danger">
+                                            <div *ngIf="schedule.errors.required">
+                                                E-mail es requerido.
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!patience.phone" style="display: inline-block;">
+                                        <label for="phone" class="control-label">Teléfono</label>
+                                        <input type="text" id="phone" name="phone" [(ngModel)]="patience.phone" #phone="ngModel" class="form-control" size="65" required>
+                                        <!-- <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" class="alert alert-danger">
+                                            <div *ngIf="phone.errors.required">
+                                                Teléfono es requerido.
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </li>
+                                <!-- <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="phone" class="control-label">Centro de Salud</label>
+                                        <div class="dropdown">
+                                            <button href="#pablo" class="dropdown-toggle btn btn-primary btn-round btn-block" style="padding-right: 90px;" data-toggle="dropdown">{{patience.healthCenter ? patience.healthCenter.name : 'Seleccione'}}
+                                                <b class="caret"></b>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-left">
+                                                <li *ngFor="let h of healthCenters">
+                                                    <div (click)="changeHealthCenter(h)">{{h.name}}</div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li> -->
+                            </ul>
+                            <div class="form-row" ngClass="btn-fixed">
+                                <button type="button" class="btn" style="margin-top: 40px;" ngClass="btn-fixed-float" (click)="close()">Cancelar</button>
+                                <button type="submit" [disabled]="!modelForm.form.valid" class="btn btn-primary" style="margin-top: 40px;" ngClass="btn-fixed-float">Guardar Cambios</button>
+                            </div>
+                            <!-- <div class="form-row" ngClass="btn-fixed">
+                                <button (click)="cancelSubmit()" style="margin-top: 40px;" ngClass="btn-fixed-float" class="btn"> Cancelar</button>
+                                <button type="submit" [disabled]="!modelForm.form.valid || !person" style="margin-top: 40px;" ngClass="btn-fixed-float" class="btn btn-primary"
+                                    style="margin-top: 40px;">{{id ? 'Finalizar' : 'Crear'}} Consulta</button>
+                            </div> -->
+                        </form>
+                        <button *ngIf="patience.id && interconsultShow" (click)="getInterconsultationPatience()" style="margin-top: 40px;" ngClass="btn-fixed-float"
+                            class="btn btn-primary" data-toggle="modal" data-target="#modalInterconsultation">Solicitudes de Interconsulta</button>
+                        <button *ngIf="patience.id" (click)="getSummaryPerson()" style="margin-top: 40px;" ngClass="btn-fixed-float" class="btn btn-primary"
+                            data-toggle="modal" data-target="#exampleModalLong"> Historia Clínica</button>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Historia Clínica:
+                                <strong>{{patience.lastName + ', ' + patience.firstName}}</strong>
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-hover" *ngIf="summaryPerson">
+                                <thead>
+                                    <th>Fecha</th>
+                                    <th>Profesional</th>
+                                    <th>Razón</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of summaryPerson;let i = index" style="cursor: pointer;">
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.consultationStartDate}}</td>
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.professionalName}}</td>
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.consultationReason}}</td>
+                                    </tr>
+                                    <!-- <tr *ngIf="!summaryPerson || summaryPerson.length == 0" style="text-align: center;">
+                                        <td colspan="7">El Paciente no Posee Historial</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                            <tr *ngIf="!summaryPerson || summaryPerson.length == 0" style="text-align: center;">
+                                <td colspan="7">No se encuentra Historia Clínica Disponible</td>
+                            </tr>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cerrarHistorial" type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="historyDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+            aria-hidden="true" style="overflow:scroll">
+            <div class="modal-dialog modal-summary" role="document">
+                <div class="modal-content" style="float:right">
+                    <div class="modal-header" *ngIf="historyConsultation">
+                        <h5 class="modal-title"> Profesional:
+                            <strong>Mat. {{historyConsultation.schedule.professional.matricula + ' - '
+                                + historyConsultation.schedule.professional.person.lastName
+                                + ', ' + historyConsultation.schedule.professional.person.firstName}}</strong>
+                        </h5>
+                        <span>Iniciada el:
+                            <strong>{{historyConsultation.startTime | date: 'EEEE, dd/MM/yy - HH:mm'}}
+                            </strong>
+                            - Finalizada el:
+                            <strong>{{historyConsultation.endTime | date: 'EEEE, dd/MM/yy - HH:mm'}}</strong>
+                        </span>
+                        <span *ngIf="historyConsultation && historyConsultation.document.length > 0">
+                            <br>
+                            <br> Resumen Firmado Digitalmente:
+                            <strong>
+                                <span *ngFor="let row of historyConsultation.document;let i = index"
+                                    style="cursor: pointer;">
+                                    <!-- <td (click)="downloadAttachment(row)">{{row.name}}</td> -->
+                                    <span *ngIf="row.code == 'DIAG'" (click)="downloadAttachment(row)">{{row.name}}
+                                        <i class="material-icons" style="color: red; font-size: 16px; ">file_download</i>
+                                    </span>
+                                    <!-- <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.consultationReason}}</td> -->
+                                </span>
+                            </strong>
+                        </span>
+                    </div>
+                    <div class="modal-body" *ngIf="historyConsultation">
+                        <button *ngIf="historyConsultation.clapId" type="button" data-dismiss="modal"
+                            ngClass="btn" class="btn btn-primary" (click)="goCLAP()">CLAP HISTORICO</button>
+                        <div class="col-md-12 col-mini">
+                            <div class="card card-mini" style="height: auto;">
+                                <div class="card-content">
+                                    <div>
+                                        <strong>Motivo de Consulta</strong>
+                                        <br>
+                                        <span>{{historyConsultation.reason}}</span>
+                                    </div>
+                                    <div>
+                                        <strong>Sintomas</strong>
+                                        <br>
+                                        <span>{{historyConsultation.symptom}}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-12 col-mini" *ngIf="historyConsultation && historyConsultation.document.length > 1">
+                            <div class=" card card-mini ">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Archivos Adjuntos</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <table class="table table-hover">
+                                            <!-- <thead>
+                                                <th>Archivo</th>
+                                                <th>Razón</th>
+                                            </thead> -->
+                                            <tbody>
+                                                <tr *ngFor="let row of historyConsultation.document;let i = index"
+                                                    style="cursor: pointer;">
+                                                    <!-- <td (click)="downloadAttachment(row)">{{row.name}}</td> -->
+                                                    <td *ngIf="row.code != 'DIAG'" (click)="downloadAttachment(row)"><a>{{row.name}}
+                                                            - Descargar</a></td>
+                                                    <!-- <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.consultationReason}}</td> -->
+                                                </tr>
+                                                <!-- <img *ngIf="filedownload" [src]="filedownload"> -->
+                                                <!-- <a *ngIf="filedownload" [download]="'archivo.' + filename"[href]="filedownload">aaaaaaaaaa</a> -->
+                                                <tr *ngIf="!historyConsultation.document || historyConsultation.document.length == 0"
+                                                    style="text-align: center;">
+                                                    <td colspan="7">No hay Archivos Adjuntos</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-mini" *ngIf="historyConsultation && historyConsultation.personalBackground">
+                            <div class=" card card-mini ">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Antecedentes Personales</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <span>{{historyConsultation.personalBackground}} </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-mini" *ngIf="historyConsultation && historyConsultation.familyBackground">
+                            <div class=" card card-mini ">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Antecedentes Familiares</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <span>{{historyConsultation.familyBackground}} </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-mini" *ngIf="true">
+                            <div class="card card-mini">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Signos Vitales</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Frecuencia Cardíaca: </strong>
+                                            <span style="float:right;">{{historyConsultation.heartRate}}
+                                                PPM</span>
+                                        </div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Presión Arterial: </strong>
+                                            <span style="float:right;">{{historyConsultation.bloodPressure}}
+                                                mmHg</span>
+                                        </div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Frecuencia Respiratoria: </strong>
+                                            <span style="float:right;">{{historyConsultation.breathingFrecuency}}
+                                                RPM</span>
+                                        </div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Temperatura Corporal: </strong>
+                                            <span style="float:right;">{{historyConsultation.temperature}}
+                                                ºC</span>
+                                        </div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Altura: </strong>
+                                            <span style="float:right;">{{historyConsultation.height}}
+                                                CM</span>
+                                        </div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Peso: </strong>
+                                            <span style="float:right;">{{historyConsultation.weight}}
+                                                KG</span>
+                                        </div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Masa Corporal: </strong>
+                                            <span style="float:right;">{{historyConsultation.bodyMass}}
+                                                IMC</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="historyConsultation.percentilBrainRadioXAge" class="col-md-6 col-mini">
+                            <div class="card card-mini">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Percentil</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Semanas / Meses: </strong>
+                                            <span style="float:right;">{{historyConsultation.agePercentile}}
+                                            </span>
+                                        </div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Perímetro Cefálico por Edad: </strong>
+                                            <span style="float:right;">{{historyConsultation.percentilBrainRadioXAge}}
+                                            </span>
+                                        </div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Altura por Edad : </strong>
+                                            <span style="float:right;">{{historyConsultation.percentilHeightXWeight}}
+                                            </span>
+                                        </div>
+                                        <div class="form-row col-xs-12 col-mini">
+                                            <strong>Peso por Edad : </strong>
+                                            <span style="float:right;">{{historyConsultation.percentilWeightXAge}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-mini" *ngIf="historyConsultation.diagnosis && historyConsultation.diagnosis.length > 0">
+                            <div class="card card-mini " style="display:block;overflow:scroll !important">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Diagnósticos</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <th>Descripción</th>
+                                                <th>Estado</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of historyConsultation.diagnosis;let i = index"
+                                                    style="cursor: pointer;">
+                                                    <td>{{row.diagnosisNomenclature.description}}</td>
+                                                    <td>{{row.diagnosisType == 'PRE' ? 'PRESUNTIVO' :
+                                                        'DEFINITIVO'}}</td>
+                                                </tr>
+                                                <tr *ngIf="!historyConsultation.diagnosis || historyConsultation.diagnosis.length == 0"
+                                                    style="text-align: center;">
+                                                    <td colspan="7">No hay diagnósticos</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-mini " *ngIf="historyVaccines && historyVaccines.length > 0">
+                            <div class="card card-mini " style="display:block;overflow:scroll !important">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Vacunas</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <th>Vacuna</th>
+                                                <th>Marca</th>
+                                                <th>Lote</th>
+                                                <th>Observaciónes</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of historyVaccines;let i = index"
+                                                    style="cursor: pointer;">
+                                                    <td>{{row.vaccineDosage.name}}</td>
+                                                    <td>{{row.brand}}</td>
+                                                    <td>{{row.lot}}</td>
+                                                    <td>{{row.observations}}</td>
+                                                </tr>
+                                                <tr *ngIf="!historyVaccines || historyVaccines.length == 0"
+                                                    style="text-align: center;">
+                                                    <td colspan="7">No hay vacunas</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-mini" *ngIf="historyConsultation.prescriptions && historyConsultation.prescriptions.length > 0">
+                            <div class="card card-mini " style="display:block;overflow:scroll !important">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Prescripciones</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <th>Prescripción</th>
+                                                <th>Administrar</th>
+                                                <th>Frecuencia</th>
+                                                <th>Duración</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of historyConsultation.prescriptions;let i = index"
+                                                    style="cursor: pointer;">
+                                                    <td *ngIf="row.vademecum.benefitType == 'M'">{{row.vademecum.activePrinciple}}</td>
+                                                    <td *ngIf="row.vademecum.benefitType == 'M'">{{row.amount}}</td>
+                                                    <td *ngIf="row.vademecum.benefitType == 'M'">{{row.frecuency}}
+                                                        hs</td>
+                                                    <td *ngIf="row.vademecum.benefitType == 'M'">{{row.duration
+                                                        + ' días - ' + (row.refill ? row.refillValue +
+                                                        ' meses' : '')}} </td>
+                                                </tr>
+                                                <tr *ngIf="!historyConsultation.prescriptions || historyConsultation.prescriptions.length == 0"
+                                                    style="text-align: center;">
+                                                    <td colspan="7">No hay prescripciones</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-mini" *ngIf="historyConsultation.prescriptions && historyConsultation.prescriptions.length > 0">
+                            <div class="card card-mini " style="display:block;overflow:scroll !important">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Estudios Complementarios</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <th>Estudio</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of historyConsultation.prescriptions;let i = index"
+                                                    style="cursor: pointer;">
+
+                                                    <td *ngIf="row.vademecum.benefitType == 'P'">{{row.vademecum.activePrinciple}}</td>
+                                                </tr>
+                                                <tr *ngIf="!historyConsultation.prescriptions || historyConsultation.prescriptions.length == 0"
+                                                    style="text-align: center;">
+                                                    <td colspan="7">No hay Estudios</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-mini " *ngIf="historyConsultation.examinationValues && historyConsultation.examinationValues.length > 0">
+                            <div class="card card-mini" style="display:block;overflow:scroll !important">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Examenes Fisicos</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <th>Examen</th>
+                                                <th>Estado</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of historyConsultation.examinationValues;let i = index"
+                                                    style="cursor: pointer;">
+                                                    <td>{{row.examinationItem.name}}</td>
+                                                    <td>{{row.examValue}}</td>
+                                                </tr>
+                                                <tr *ngIf="!historyConsultation.examinationValues || historyConsultation.examinationValues == 0"
+                                                    style="text-align: center;">
+                                                    <td colspan="7">No hay examenes realizados</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-mini " *ngIf="historyConsultation.examinationOphthalmologyDto && historyConsultation.examinationOphthalmologyDto.length > 0">
+                            <div class="card card-mini" style="display:block;overflow:scroll !important">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Examenes Oftalmologicos</strong>
+                                        </h5>
+                                    </div>
+                                    <div>
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <th>Examen</th>
+                                                <th>Estado</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of historyConsultation.examinationOphthalmologyDto;let i = index"
+                                                    style="cursor: pointer;">
+                                                    <td>{{row.name}}</td>
+                                                    <td>{{row.examValue}}</td>
+                                                </tr>
+                                                <tr *ngIf="!historyConsultation.examinationValues || historyConsultation.examinationOphthalmologyDto.length == 0"
+                                                    style="text-align: center;">
+                                                    <td colspan="7">No hay examenes realizados</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-mini " *ngIf="historyConsultation.ophthalmologicPrescription && historyConsultation.ophthalmologicPrescription.vademecum">
+                            <div class="card card-mini" style="display:block;overflow:scroll !important">
+                                <div class="card-content">
+                                    <div>
+                                        <h5>
+                                            <strong>Receta de Lentes</strong>
+                                        </h5>
+                                    </div>
+
+                                    <md-form-field class="form-group form-black is-empty col-md-12"
+                                        style="margin-top: 0px;">
+                                        <input readonly mdInput placeholder="" type="text" id="vademOp"
+                                            name="vademOp" [(ngModel)]="historyConsultation.ophthalmologicPrescription.vademecum.activePrinciple"
+                                            #vademOps="ngModel" style="text-align: center;" />
+                                        <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                    </md-form-field>
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <th>Examen</th>
+                                            <th>Valor</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let row of historyConsultation.ophthalmologicPrescription.examinationValues;let i = index"
+                                                style="cursor: pointer;">
+                                                <td>{{row.name}}</td>
+                                                <td>{{row.examValue == 'true' ? 'SI' : row.examValue ==
+                                                    'false'
+                                                    ? 'NO' : row.examValue }}
+                                                <td>
+                                            </tr>
+                                            <tr *ngIf="!historyConsultation.ophthalmologicPrescription.examinationValues || historyConsultation.ophthalmologicPrescription.examinationValues.length == 0"
+                                                style="text-align: center;">
+                                                <td colspan="7">No hay prescripciones realizadas</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+            <div class="modal fade" id="modalInterconsultation" tabindex="-1" role="dialog" aria-labelledby="modalInterconsultationTitle"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document" style="width:700px">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Solicitudes de Inter-consultas de:
+                                <strong>{{patience.lastName + ', ' + patience.firstName}}</strong>
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-hover" *ngIf="interconsultationPatience && interconsultationPatience.length > 0">
+                                <thead style="text-align: left;">
+                                    <th style="text-align: left;">Fecha</th>
+                                    <th style="text-align: left;">Servicio</th>
+                                    <th style="text-align: left;">Profesional</th>
+                                    <th style="text-align: left;">Servicio Remoto</th>
+                                    <th style="text-align: left;">Telemedicina&nbsp;</th>
+                                    <th style="text-align: left;">Prioridad</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of interconsultationPatience;let i = index" style="cursor: pointer;">
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openToday(row)">{{row.dateCreated| date: 'dd/MM/yyyy - HH:mm'}}</td>
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openToday(row)">{{row.service.name}}</td>
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openToday(row)">{{row.professional.person.lastName + ', ' + row.professional.person.firstName}}</td>
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openToday(row)">{{row.remoteService.name}}</td>
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openToday(row)">{{row.telemedicine ? 'SI' : 'NO'}}</td>
+                                        <!-- <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.priority == 1 ? 'ALTA' : 'MEDIA'}}</td> -->
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" *ngIf="row.priority == 1" (click)="openToday(row)">
+                                            <i class="material-icons" style="color: rgb(219, 75, 75);font-size:40px;">arrow_drop_up
+                                                <span class="tooltiptext">Alta</span>
+                                            </i>
+                                        </td>
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" *ngIf="row.priority == 2" (click)="openToday(row)">
+                                            <i class="material-icons" style="color: rgb(224, 202, 77);font-size:40px;">remove
+                                                <span class="tooltiptext">Normal</span>
+                                            </i>
+                                        </td>
+                                        <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" *ngIf="row.priority == 3" (click)="openToday(row)">
+                                            <i class="material-icons" style="color: rgb(70, 189, 70);font-size:40px;">arrow_drop_down
+                                                <span class="tooltiptext">Baja</span>
+                                            </i>
+                                        </td>
+                                        <!-- <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" *ngIf="row.priority == 3">BAJA</td> -->
+                                    </tr>
+                                    <!-- <tr *ngIf="!summaryPerson || summaryPerson.length == 0" style="text-align: center;">
+                                            <td colspan="7">El Paciente no Posee Historial</td>
+                                        </tr> -->
+                                </tbody>
+                            </table>
+                            <tr *ngIf="!interconsultationPatience || interconsultationPatience.length == 0" style="text-align: center;">
+                                <td colspan="7">No se encuentran Interconsultas</td>
+                            </tr>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

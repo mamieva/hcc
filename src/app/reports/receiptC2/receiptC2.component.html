@@ -1,0 +1,138 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">receipt</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title"> Generación de Planilla Mensual</h4>
+                        <div>
+                            <form (ngSubmit)="onSubmit()" #receiptForm="ngForm">
+                                <div class="col-xs-6">
+                                    <div class="col-xs-12">
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h4 class="card-title">Búsqueda</h4>
+                                                <div>
+                                                    <!-- <div class="form-group form-black is-empty label-floating" style="display: inline-block;">
+                                                        <md-form-field>
+                                                            <input readonly mdInput [mdDatepicker]="picker" placeholder="Seleccione dia" id="date" name="date" [(ngModel)]="receipt.date"
+                                                                #date="ngModel">
+                                                            <md-datepicker-toggle mdSuffix [for]="picker"></md-datepicker-toggle>
+                                                            <md-datepicker startView="year" #picker></md-datepicker>
+                                                        </md-form-field>
+                                                    </div> -->
+                                                    <md-select [color]="selectTheme" id="year" name="year" [(ngModel)]="year" (ngModelChange)="changeYear($event)"
+                                                        #yearse="ngModel" placeholder="Año" ngClass="btn btn-primary btn-round simple">
+                                                        <md-option *ngFor="let anio of years" [value]="anio">
+                                                            {{anio}}
+                                                        </md-option>
+                                                    </md-select>
+                                                    <md-select [color]="selectTheme" id="month" name="month"
+                                                        [(ngModel)]="month" #documentTypa="ngModel" placeholder="Mes"
+                                                        ngClass="btn btn-primary btn-round simple">
+                                                        <md-option *ngIf="maxDate >= 1" value="1">
+                                                            Enero
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 2" value="2">
+                                                            Febrero
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 3" value="3">
+                                                            Marzo
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 4" value="4">
+                                                            Abril
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 5" value="5">
+                                                            Mayo
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 6" value="6">
+                                                            Junio
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 7" value="7">
+                                                            Julio
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 8" value="8">
+                                                            Agosto
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 9" value="9">
+                                                            Septiembre
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 10" value="10">
+                                                            Octubre
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 11" value="11">
+                                                            Noviembre
+                                                        </md-option>
+                                                        <md-option *ngIf="maxDate >= 12" value="12">
+                                                            Diciembre
+                                                        </md-option>
+                                                    </md-select>
+                                                    <!-- </div> -->
+                                                    <!-- <span style="font-size: 10px">Se tomará el mes del día seleccionado</span> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="col-xs-12">
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h4 class="card-title">Especialidad</h4>
+                                                <div class="row" style="display: inline;">
+                                                    <md-form-field class="example-full-width" style="width: 90%">
+                                                        <input mdInput placeholder="Seleccionar Especialidad" aria-label="Especialidad"
+                                                            [mdAutocomplete]="auto" [formControl]="serviceCtrl" name="service"
+                                                            id="service" [(ngModel)]="receipt.specialties" (ngModelChange)="selectService($event)">
+                                                        <md-autocomplete #auto="mdAutocomplete" [displayWith]="displayFn.bind(this)">
+                                                            <md-option ngClass="simple mat-select-content" *ngFor="let prof of filteredServices | async"
+                                                                [value]="prof" style="width: 90%; text-align: left;">
+                                                                <span style="float: left;">{{prof.name}}
+                                                                </span>
+                                                            </md-option>
+                                                        </md-autocomplete>
+                                                    </md-form-field>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="servicesSelected.length > 0" class="col-md-12">
+                                    <h5>Especialidades Seleccionadas</h5>
+                                    <div *ngFor="let row of servicesSelected; let i = index;">
+                                        <i *ngIf="!receipt.blob" (click)="deleteService(i);" class="material-icons"
+                                            style="font-size: 18px;color:red; cursor: pointer; ">
+                                            <span class="tooltiptext">Quitar</span>delete</i>
+                                        <span style="font-weight: bold">{{row.name}}</span>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12" style="margin-top:15px" *ngIf="receipt.blob">
+                                    <a [download]="receipt.name ? receipt.name :'PLANILLA DIARIA - MENSUAL ' + month + ' - ' + year +'.pdf'"
+                                        [href]="'data:application/octet-stream;base64,' + receipt.blob | reportsC2SafeHtml"
+                                        (click)="reset()">Descargar PDF
+                                        <i class="material-icons" style="font-size: 40px; ">
+                                            file_download</i>
+                                    </a>
+                                    <a style="margin-left: 15px" [download]="receipt.csvName ? receipt.csvName :'PLANILLA DIARIA - MENSUAL ' + month + ' - ' + year +'.csv'"
+                                        [href]="'data:text/csv;charset=utf-8;base64,' + receipt.csv | reportsC2SafeHtml"
+                                        (click)="reset()">Descargar Excel
+                                        <i class="material-icons" style="font-size: 40px; ">file_download</i>
+                                    </a>
+                                </div>
+                                <div class="col-md-12">
+                                    <button type="submit" [disabled]="servicesSelected.length == 0 || !month || !year"
+                                        class="btn btn-primary" style="margin-top: 40px;">Generar Planilla</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

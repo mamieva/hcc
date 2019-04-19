@@ -1,0 +1,2235 @@
+<div class="main-content" id="top">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">assignment</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="title">{{title}}</h4>
+                        <div class="col-xs-12">
+                            <div class="col-xs-12">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <!-- h4 class="card-title" *ngIf="!person">Buscar Persona</h4 -->
+                                        <div *ngIf="!person">
+                                            <div class="form-group label-floating col-md-6" style="margin-top: 0px;">
+                                                <label class="control-label">Número de Documento</label>
+                                                <input type="text" [(ngModel)]="documentNumber" class="form-control doc-number">
+                                            </div>
+                                            <div class="radio col-md-3">
+                                                <label>
+                                                    <input type="radio" name="sex" value="M" [(ngModel)]="sex">
+                                                    Masculino
+                                                </label>
+                                                <label>
+                                                    <input type="radio" name="sex" value="F" [(ngModel)]="sex">
+                                                    Femenino
+                                                </label>
+                                            </div>
+                                            <button type="submit" class="btn btn-white btn-round btn-just-icon col-md-1"
+                                                (click)="findPerson()">
+                                                <i class="material-icons">search</i>
+                                                <div class="ripple-container"></div>
+                                            </button>
+                                        </div>
+                                        <div *ngIf="person" style="display: inline;">
+                                            <div class="photo col-xs-2">
+                                                <img [src]="'data:image;base64,' + person.photoBase64 | consultationSafeHtml" />
+                                            </div>
+                                            <div class="col-xs-9">
+                                                <span style="color:#f44336;font-weight: bold;">{{person.lastName}},
+                                                    {{person.firstName}}</span>
+                                                <br />
+                                                <span>
+                                                    <strong>N° de Identidad: {{person.docNumber}}</strong>
+                                                </span>
+                                                <br />{{person.age}}</div>
+                                            <i class="material-icons col-xs-1" style="float: right; cursor: pointer;"
+                                                (click)="closePerson()" *ngIf="!id">close</i>
+                                            <button *ngIf="isSpecialtyModules('HC')" (click)="getSummaryPerson()" style="margin-top: 40px;"
+                                                ngClass="btn-fixed-float" class="btn btn-primary" data-toggle="modal"
+                                                data-target="#exampleModalLong">
+                                                Historial de Consultas</button>
+
+                                            <button style="margin-top: 40px;" ngClass="btn-fixed-float" class="btn btn-primary"
+                                                data-toggle="modal" data-target="#attachment">
+                                                <i class="material-icons">attach_file</i> Adjuntar Archivo
+                                                <span *ngIf="attachmentFiles && attachmentFiles.length > 0">({{attachmentFiles.length}})</span>
+                                            </button>
+                                            <button (click)="initCLAP()" style="margin-top: 40px;" ngClass="btn-fixed-float"
+                                                class="btn btn-primary" *ngIf="isSpecialtyModules('CLAP')">
+                                                <i class="material-icons">description</i> {{ model.clapId ? 'Editar' :
+                                                'Iniciar'}} CLAP
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <form (ngSubmit)="" #modelForm="ngForm"> -->
+                        <!-- <li class="form-row"> -->
+                        <div class="col-md-12 col-xs-12 card" style="margin-top: 0" *ngIf="isSpecialtyModules('MAIN_DATA')">
+                            <!-- <h5>Datos Principales</h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Datos Principales</h5>
+                            </div>
+
+                            <div class="card-content">
+                                <div *ngIf="isSpecialtyModules('REASON')" class="col-md-12 form-group form-black is-empty"
+                                    [class.label-floating]="!id && !model.reason" style="display: inline-block;">
+                                    <label for="reason" class="control-label">Motivo de la Consulta</label>
+                                    <textarea type="text" id="reason" name="reason" [(ngModel)]="model.reason" #reason="ngModel"
+                                        class="note form-control" rows="4" maxlength="2000" required>
+
+                                        </textarea>
+                                    <span mdSuffix style="float:right">{{model.reason ? model.reason.length : '0'}}
+                                        /2000&nbsp;</span>
+                                </div>
+                                <div *ngIf="isSpecialtyModules('SYMPTOM')" class="col-md-12 form-group form-black is-empty"
+                                    [class.label-floating]="!id && !model.symptom" style="display: inline-block;">
+                                    <label for="symptom" class="control-label">Sintomas</label>
+                                    <textarea type="text" id="symptom" name="symptom" [(ngModel)]="model.symptom"
+                                        #symptom="ngModel" rows="4" maxlength="2000" class="note form-control">
+
+                                        </textarea>
+                                    <span mdSuffix style="float:right">{{model.symptom ? model.symptom.length :
+                                        '0'}} /2000&nbsp;</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row" ngClass="btn-fixed">
+                            <button (click)="cancelSubmit(false)" style="margin-top: 40px;" ngClass="btn-fixed-float"
+                                class="btn"> Salir</button>
+                            <!-- <button type="submit" [disabled]="!modelForm.form.valid || !person || diagnosises.length == 0" style="margin-top: 40px;" -->
+                            <button (click)="onSubmit(false,true)" [disabled]="showBtnFinalizar()" style="margin-top: 40px;"
+                                ngClass="btn-fixed-float" class="btn btn-primary">Guardar Consulta</button>
+                            <button (click)="onSubmit(false)" [disabled]="showBtnFinalizar()" style="margin-top: 40px;"
+                                ngClass="btn-fixed-float" class="btn btn-primary" style="margin-top: 40px;">{{id ?
+                                'Firmar ' : 'Crear'}}
+                                Consulta</button>
+                        </div>
+                        <!-- </form> -->
+                        <div *ngIf="isSpecialtyModules('BACKGROUND')" class="col-md-12 col-xs-12 card">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Antecedentes Personales</h5>
+                            </div>
+                            <!-- <h5>Antecedentes Personales</h5> -->
+                            <div class="card-content">
+                                <!-- <div *ngIf="isSpecialtyModules('REASON')" class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !model.reason" -->
+                                <div *ngIf="person.personalBackground && person.personalBackground.length > 0" class="col-md-12 form-group form-black is-empty"
+                                    [class.label-floating]="!id && !person.familyBackground" style="display: inline-block;">
+                                    <label for="reason" class="control-label">Histórico</label>
+                                    <textarea type="text" id="personBackground" name="personBackground" [(ngModel)]="person.personalBackground"
+                                        #personBackground="ngModel" class="note form-control" rows="4" readonly>
+
+                                    </textarea>
+                                    <!-- <span mdSuffix style="float:right">{{model.reason ? model.reason.length : '0'}} /2000&nbsp;</span> -->
+                                </div>
+                                <!-- <div *ngIf="isSpecialtyModules('SYMPTOM')" class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !model.symptom" -->
+                                <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !model.familyBackground"
+                                    style="display: inline-block;">
+                                    <label for="symptom" class="control-label">Adicionar Antecedentes</label>
+                                    <textarea type="text" id="personalBackground" name="personalBackground" [(ngModel)]="model.personalBackground"
+                                        #symptom="ngModel" rows="4" maxlength="2000" class="note form-control">
+
+                                    </textarea>
+                                    <span mdSuffix style="float:right">{{model.personalBackground ?
+                                        model.personalBackground.length : '0'}} /2000&nbsp;</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="isSpecialtyModules('BACKGROUND')" class="col-md-12 col-xs-12 card">
+                            <!-- <h5>Antecedentes Familiares</h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Antecedentes Familiares</h5>
+                            </div>
+                            <div class="card-content">
+                                <!-- <div *ngIf="isSpecialtyModules('REASON')" class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !model.reason" -->
+                                <div *ngIf="person.familyBackground && person.familyBackground.length > 0" class="col-md-12 form-group form-black is-empty"
+                                    [class.label-floating]="!id && !person.familyBackground" style="display: inline-block;">
+                                    <label for="reason" class="control-label">Histórico</label>
+                                    <textarea type="text" id="personBackground" name="personBackground" [(ngModel)]="person.familyBackground"
+                                        #personBackground="ngModel" class="note form-control" rows="4" readonly>
+
+                                    </textarea>
+                                    <!-- <span mdSuffix style="float:right">{{model.reason ? model.reason.length : '0'}} /2000&nbsp;</span> -->
+                                </div>
+                                <!-- <div *ngIf="isSpecialtyModules('SYMPTOM')" class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !model.symptom" -->
+                                <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !model.familyBackground"
+                                    style="display: inline-block;">
+                                    <label for="symptom" class="control-label">Adicionar Antecedentes</label>
+                                    <textarea type="text" id="familyBackground" name="familyBackground" [(ngModel)]="model.familyBackground"
+                                        #symptom="ngModel" rows="4" maxlength="2000" class="note form-control">
+
+                                    </textarea>
+                                    <span mdSuffix style="float:right">{{model.familyBackground ?
+                                        model.familyBackground.length : '0'}} /2000&nbsp;</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 card" style="margin-top: 0" *ngIf="isSpecialtyModules('SIGNS')">
+                            <!-- <div class="col-md-12 card" style="margin-top: 0"> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Signos Vitales</h5>
+                            </div>
+                            <!-- <h5>Signos Vitales</h5> -->
+                            <div class="card-content">
+                                <!-- <ul class="dynform2"> -->
+                                <div class="col-md-4 form-row">
+                                    <md-form-field class="form-group form-black is-empty">
+                                        <span mdPrefix>
+                                            <i class="fa fa-heartbeat" style="font-size: 24px; color:#f44336"></i>&nbsp;
+                                        </span>
+                                        <input mdInput placeholder="Frecuencia Cardíaca" maxlength="3" style="text-align: right"
+                                            type="text" id="heartRate" name="heartRate" [formControl]="heartRate"
+                                            [(ngModel)]="model.heartRate" (focus)="clearSign($event)" step="1"
+                                            (keydown)="ctrlKeyDown($event)">
+                                        <span mdSuffix>PPM&nbsp;</span>
+                                    </md-form-field>
+                                </div>
+                                <div class="col-md-4 form-row">
+                                    <md-form-field class="form-group form-black is-empty">
+                                        <input mdInput placeholder="Sistólica" style="text-align: right" type="text" id="sistolic"
+                                            name="sistolic" [(ngModel)]="sistolica" maxlength="3" [formControl]="sistolic"
+                                            (focus)="clearSign($event)" (keydown)="ctrlKeyDown($event)" />
+                                        <span mdSuffix>mmHg&nbsp;</span>
+                                    </md-form-field>
+                                </div>
+                                <div class="col-md-4 form-row">
+                                    <md-form-field class="form-group form-black is-empty">
+                                        <input mdInput placeholder="Diastólica" maxlength="3" style="text-align: right"
+                                            type="text" id="diastolic" name="diastolic" [formControl]="diastolic"
+                                            [(ngModel)]="diastolica" (focus)="clearSign($event)" (keydown)="ctrlKeyDown($event)" />
+                                        <span mdSuffix>mmHg&nbsp;</span>
+                                    </md-form-field>
+                                </div>
+                                <div class="col-md-4 form-row">
+                                    <md-form-field class="form-group form-black is-empty">
+                                        <input placeholder="Frecuencia Respiratoria" type="text" maxlength="3" mdInput
+                                            id="breathingFrecuency" name="breathingFrecuency" [formControl]="breathingFrecuency"
+                                            [(ngModel)]="model.breathingFrecuency" (focus)="clearSign($event)" style="text-align: right"
+                                            (keydown)="ctrlKeyDown($event)" />
+                                        <span mdSuffix>RPM&nbsp;</span>
+                                    </md-form-field>
+
+                                </div>
+                                <div class="col-md-4 form-row">
+                                    <md-form-field class="form-group form-black is-empty">
+                                        <span mdPrefix>
+                                            <i class="fas fa-thermometer" style="font-size: 24px; color:#f44336"></i>
+                                        </span>
+                                        <input mdInput placeholder="Temperatura Corporal" maxlength="5" type="text" id="temperature"
+                                            name="temperature" [(ngModel)]="model.temperature" [formControl]="temperature"
+                                            (focus)="clearSign($event)" style="text-align: right" (keydown)="ctrlKeyDown($event)" />
+                                        <span mdSuffix>ºC&nbsp;</span>
+                                    </md-form-field>
+                                </div>
+                                <div class="col-md-4 form-row">
+                                    <md-form-field class="form-group form-black is-empty">
+                                        <span mdPrefix>
+                                            <i class="fas fa-ruler" style="font-size: 24px; color:#f44336"></i>
+                                        </span>
+                                        <input placeholder="Altura" mdInput type="text" id="height" name="height"
+                                            [(ngModel)]="model.height" [formControl]="height" maxlength="6" (focus)="clearSign($event)"
+                                            style="text-align: right" (keyup)="calculateIMC()" (keydown)="ctrlKeyDown($event)" />
+                                        <span mdSuffix>CM&nbsp;</span>
+                                    </md-form-field>
+                                </div>
+                                <div class="col-md-4 form-row">
+                                    <md-form-field class="form-group form-black is-empty ">
+                                        <span mdPrefix>
+                                            <i class="fas fa-weight" style="font-size: 24px; color:#f44336"></i>
+                                        </span>
+                                        <input mdInput placeholder="Peso" type="text" id="weight" name="weight"
+                                            [(ngModel)]="model.weight" [formControl]="weight" maxlength="6" (keyup)="calculateIMC()"
+                                            (focus)="clearSign($event)" style="text-align: right" (keydown)="ctrlKeyDown($event)" />
+                                        <span mdSuffix>KG&nbsp;</span>
+                                    </md-form-field>
+                                </div>
+                                <div class="col-md-4 form-row">
+                                    <md-form-field class="form-group form-black is-empty">
+                                        <input mdInput placeholder="Masa Corporal" style="text-align: right" type="number"
+                                            id="bodyMass" name="bodyMass" [(ngModel)]="model.bodyMass" #bodyMass="ngModel"
+                                            disabled />
+                                        <span mdSuffix>IMC&nbsp;</span>
+                                        <i *ngIf="model.bodyMass > 0 && model.bodyMass < 18.5" class="material-icons"
+                                            style="color: rgb(98, 172, 150); font-weight:bold;" mdSuffix>arrow_downward
+                                            <span class="tooltiptext">Infrapeso</span>
+                                        </i>
+                                        <i *ngIf="model.bodyMass >= 18.5 && model.bodyMass <= 24.99" class="material-icons"
+                                            style="color: rgb(29, 173, 29); font-weight:bold;" mdSuffix>done_all
+                                            <span class="tooltiptext">Peso Normal</span>
+                                        </i>
+                                        <i *ngIf="model.bodyMass >= 25 && model.bodyMass <= 29.99" class="material-icons"
+                                            style="color: rgb(211, 78, 16); font-weight:bold;" mdSuffix>call_made
+                                            <span class="tooltiptext">Pre Obsesidad</span>
+                                        </i>
+                                        <i *ngIf="model.bodyMass >= 30" class="material-icons" style="color: rgb(192, 45, 45); font-weight:bold;"
+                                            mdSuffix>arrow_upward
+                                            <span class="tooltiptext">Obesidad</span>
+                                        </i>
+                                    </md-form-field>
+                                </div>
+                                <!-- md-4 -->
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-xs-12 card" style="margin-top: 0px">
+                            <!-- <h5>Notas Internas</h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Notas Internas</h5>
+                            </div>
+                            <div class="card-content">
+                                <!-- <div *ngIf="isSpecialtyModules('REASON')" class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !model.reason" -->
+                                <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !person.notes"
+                                    style="display: inline-block;">
+                                    <label for="notesPerson" class="control-label">Histórico</label>
+                                    <textarea type="text" id="notesPerson" name="notesPerson" [(ngModel)]="person.notes"
+                                        #notesPerson="ngModel" class="note form-control" rows="4" readonly>
+
+                                    </textarea>
+                                    <!-- <span mdSuffix style="float:right">{{model.reason ? model.reason.length : '0'}} /2000&nbsp;</span> -->
+                                </div>
+                                <!-- <div *ngIf="isSpecialtyModules('SYMPTOM')" class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !model.symptom" -->
+                                <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !model.note"
+                                    style="display: inline-block;">
+                                    <label for="note" class="control-label">Adicionar Nota</label>
+                                    <textarea type="text" id="notes" name="notes" [(ngModel)]="model.notes" #notes="ngModel"
+                                        rows="4" maxlength="2000" class="note form-control">
+
+                                    </textarea>
+                                    <span mdSuffix style="float:right">{{model.notes ? model.notes.length : '0'}}
+                                        /2000&nbsp;</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="monthsAge < 60 && isSpecialtyModules('PERCENTILE')" class="col-md-6 col-xs-12 card card-fixed"
+                            style="height:350px;">
+                            <!-- <h5>Percentiles</h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Percentiles</h5>
+                            </div>
+                            <md-form-field class="form-group form-black is-empty col-md-4">
+                                <input mdInput placeholder="Altura" type="number" id="height" name="height" [(ngModel)]="model.height"
+                                    #height="ngModel" />
+                                <span mdSuffix>CM&nbsp;</span>
+                            </md-form-field>
+                            <md-form-field class="form-group form-black is-empty col-md-4">
+                                <input mdInput placeholder="Peso" type="number" id="weight" name="weight" [(ngModel)]="model.weight"
+                                    #weight="ngModel" />
+                                <span mdSuffix>KG&nbsp;</span>
+                            </md-form-field>
+                            <md-form-field class="form-group form-black is-empty col-md-4">
+                                <input mdInput placeholder="Perímetro Cefalico" type="number" id="brainRadio" name="brainRadio"
+                                    [(ngModel)]="model.brainRadio" #brainRadio="ngModel" />
+
+                                <span mdSuffix>CM&nbsp;</span>
+                            </md-form-field>
+                            <md-form-field class="form-group form-black is-empty col-md-5">
+                                <input mdInput placeholder="Semanas/Meses Cumplidos" type="text" id="birthDay" name="birthDay"
+                                    [(ngModel)]="person.agePercentile" #birthDay="ngModel" disabled="disabled" />
+                            </md-form-field>
+                            <div class="form-group form-black is-empty col-md-7" [class.label-floating]="!isWeek" style="display: inline-block;">
+                                <!-- <md-select class="col-md-6" [color]="selectTheme" id="isWeek" name="isWeek" [(ngModel)]="percentileIsWeek" #isWeek="ngModel" placeholder="Seleccionar"
+                                    ngClass="btn btn-primary btn-round simple">
+                                    <md-option value="0">
+                                        Meses
+                                    </md-option>
+                                    <md-option value="1">
+                                        Semanas
+                                    </md-option>
+                                </md-select> -->
+                                <label style="margin: 0px 30px; ">
+                                    <input type="radio" id="isweek" name="isweek" value="1" [(ngModel)]="percentileIsWeek">
+                                    Semanas
+                                </label>
+                                <label style="margin: 0px 30px;">
+                                    <input type="radio" id="isweek" name="isweek" value="0" [(ngModel)]="percentileIsWeek">
+                                    Meses
+                                </label>
+                            </div>
+                            <div class="col-md-12" *ngIf="model.percentilWeightXAge && model.percentilHeightXWeight && model.percentilBrainRadioXAge">
+                                <md-form-field class="form-black is-empty col-md-4">
+                                    <input mdInput placeholder="Altura x Edad" type="text" id="percentil" name="percentil"
+                                        [(ngModel)]="model.percentilHeightXWeight" #percentil="ngModel" disabled />
+                                </md-form-field>
+                                <md-form-field class="form-black is-empty col-md-4">
+                                    <input mdInput placeholder="Peso x Edad" type="text" id="percentil" name="percentil"
+                                        [(ngModel)]="model.percentilWeightXAge" #percentil="ngModel" disabled />
+                                </md-form-field>
+                                <md-form-field class="form-black is-empty col-md-4">
+                                    <input mdInput placeholder="Perímetro x Edad" type="text" id="percentil" name="percentil"
+                                        [(ngModel)]="model.percentilBrainRadioXAge" #percentil="ngModel" disabled />
+                                </md-form-field>
+                            </div>
+                            <button (click)="calculatePercentiles()" [disabled]="(!model.brainRadio || model.brainRadio == 0) && (!model.weight || model.weight == 0) && (!model.height || model.height == 0)"
+                                style="margin-top: 0px;float:right;" class="col-md-12 btn btn-primary">Calcular
+                                Percentiles</button>
+                        </div>
+                        <div *ngIf="monthsAge < 60 && isSpecialtyModules('PERCENTILE')" class="col-md-6 col-xs-12 card card-fixed"
+                            style="height:350px;">
+                            <!-- <h5>Historial Percentil</h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Historial Percentil</h5>
+                            </div>
+                            <table class="table table-hover">
+                                <thead>
+                                    <th>Perímetro Cefálico por Edad</th>
+                                    <th>Altura por Edad</th>
+                                    <th>Peso por Edad</th>
+                                    <!-- <th>Acción</th> -->
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of historyPercentil;let i = index" style="cursor: pointer;">
+                                        <td>{{row.percentilBrainRadioXAge}}</td>
+                                        <td>{{row.percentilHeightXWeight}}</td>
+                                        <td>{{row.percentilWeightXAge}}</td>
+                                        <!-- <td>
+                                            <i style="color: #f56262" *ngIf="row.status != 'BAJ'" (click)="deleteComplementary(row,i)" title="Eliminar" class="material-icons">delete</i>
+                                        </td> -->
+                                    </tr>
+                                    <tr *ngIf="!historyPercentil || historyPercentil.length == 0" style="text-align: center;">
+                                        <td colspan="7">Aún no hay historial</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div *ngIf="examinationItems && examinationItems.length > 0  && isSpecialtyModules('EXAM')"
+                            class="col-md-6 col-xs-12 card card-fixed" style="height:350px">
+                            <!-- <h5>Examenes Fisicos</h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Exámenes Físicos</h5>
+                            </div>
+                            <div class="card-content">
+                                <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white;">
+                                    <input mdInput placeholder="Buscar Aparato o Sistema" aria-label="Buscar Aparato o Sistema"
+                                        [mdAutocomplete]="autos" [formControl]="examinationCtrl" [(ngModel)]="examinations"
+                                        #examinationVal>
+                                    <md-autocomplete #autos="mdAutocomplete" [displayWith]="displayFn.bind(this)">
+                                        <md-option ngClass="simple mat-select-content" *ngFor="let exam of filteredExaminations | async"
+                                            [value]="exam">
+                                            <span style="float: left;">{{ exam.name }}</span>
+                                        </md-option>
+                                    </md-autocomplete>
+                                </md-form-field>
+                                <label for="symptom" class="control-label">Resultados Examen</label>
+                                <textarea type="text" id="symptom" name="symptom" [(ngModel)]="examinationResult"
+                                    #examination="ngModel" rows="3" maxlength="2000" class="note form-control"
+                                    #examinationRes>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{examinationResult ? examinationResult.length :
+                                    '0'}} /2000&nbsp;</span>
+                                <button (click)="addExamination(examinationCtrl.value)" [disabled]="!examinationResult"
+                                    style="margin-top: 40px;float:right;" class="btn btn-primary">Aceptar</button>
+                            </div>
+                        </div>
+                        <!-- <div *ngIf="examinationItems && examinationItems.length > 0" class="col-md-6 col-xs-12 card card-fixed" style="overflow:scroll; height:350px"> -->
+                        <div *ngIf="examinationItems && examinationItems.length > 0  && isSpecialtyModules('EXAM')"
+                            class="col-md-6 col-xs-12 card card-fixed scrolleable" style="height:350px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Resumen Exámenes Físicos</h5>
+                            </div>
+                            <!-- <h5>Examenes Fisicos</h5> -->
+                            <table class="table table-hover">
+                                <thead>
+                                    <th>Examen</th>
+                                    <th>Resultado</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of examinationValues;let i = index" style="cursor: pointer;">
+                                        <td (click)="openRow(row,i)">{{row.examinationItem.name}}</td>
+                                        <td (click)="openRow(row,i)">{{row.examValue | slice: 0:30}}...</td>
+                                        <td>
+                                            <i style="color: #f56262" *ngIf="row.status != 'BAJ'" (click)="deleteExamination(row,i)"
+                                                title="Eliminar" class="material-icons">delete</i>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="!examinationValues || examinationValues.length == 0" style="text-align: center;">
+                                        <td colspan="7">No se han realizado examenes</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div *ngIf="diagnosisValues && diagnosisValues.length > 0 && isSpecialtyModules('DIAGNOSIS')"
+                            class="col-md-6 col-xs-12 card card-fixed" style="height:260px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Diagnósticos</h5>
+                            </div>
+                            <!-- <h5>Diagnosticos</h5> -->
+                            <div class="card-content">
+                                <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white;">
+                                    <input mdInput placeholder="Diagnostico" aria-label="Diagnostico" [mdAutocomplete]="diagnos"
+                                        [formControl]="diagnosisCtrl" [(ngModel)]="diagnosisNomen">
+                                    <md-autocomplete #diagnos="mdAutocomplete" [displayWith]="displayDiag.bind(this)">
+                                        <md-option ngClass="simple mat-select-content" *ngFor="let diag of filteredDiagnosis | async"
+                                            [value]="diag">
+                                            <span style="float: left;">{{diag.code + ' - ' +diag.description}}</span>
+                                        </md-option>
+                                    </md-autocomplete>
+                                </md-form-field>
+                                <div class="col-md-12" style="text-align: center;">
+                                    <label style="margin: 10px 30px; ">
+                                        <input type="radio" name="diagnosisType" value="PRE" [(ngModel)]="diagnosis.diagnosisType">
+                                        Presuntivo
+                                    </label>
+                                    <label style="margin: 10px 30px; ">
+                                        <input type="radio" name="diagnosisType" value="DEF" [(ngModel)]="diagnosis.diagnosisType">
+                                        Definitivo
+                                    </label>
+                                </div>
+                                <button (click)="addDiagnosis(diagnosisCtrl.value)" [disabled]="!diagnosisNomen" style="margin-top: 40px;float:right;"
+                                    class="btn btn-primary">Aceptar</button>
+                            </div>
+                        </div>
+                        <!-- <div *ngIf="diagnosisValues && diagnosisValues.length > 0" class="col-md-6 col-xs-12 card card-fixed" style="overflow:scroll;height:260px"> -->
+                        <div *ngIf="diagnosisValues && diagnosisValues.length > 0 && isSpecialtyModules('DIAGNOSIS')"
+                            class="col-md-6 col-xs-12 card card-fixed scrolleable" style="height:260px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Resumen Diagnósticos</h5>
+                            </div>
+                            <!-- <h5>Diagnosticos</h5> -->
+                            <table class="table table-hover">
+                                <thead>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of diagnosises;let i = index" style="cursor: pointer;">
+                                        <td (click)="openRowDiagnosis(row,i)">{{row.diagnosisNomenclature.description}}</td>
+                                        <td (click)="openRowDiagnosis(row,i)">{{row.diagnosisType == 'PRE' ?
+                                            'PRESUNTIVO' : 'DEFINITIVO'}}</td>
+                                        <td>
+                                            <i style="color: #f56262" *ngIf="row.status != 'BAJ'" (click)="deleteDiagnosis(row,i)"
+                                                title="Eliminar" class="material-icons">delete</i>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="!diagnosises || diagnosises.length == 0" style="text-align: center;">
+                                        <td colspan="7">No hay diagnosticos</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div *ngIf="complementaryStudies && complementaryStudies.length > 0 && isSpecialtyModules('STUDIES')"
+                            class="col-md-6 col-xs-12 card card-fixed" style="height:300px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Estudios Complementarios</h5>
+                            </div>
+                            <!-- <h5>Estudios Complementarios</h5> -->
+                            <div class="card-content">
+                                <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white;">
+                                    <input mdInput placeholder="Estudio Complementario" aria-label="Estudio Complementario"
+                                        [mdAutocomplete]="complementariess" [formControl]="complementaryCtrl"
+                                        [(ngModel)]="comstudies">
+                                    <md-autocomplete #complementariess="mdAutocomplete" [displayWith]="displayVade.bind(this)">
+                                        <md-option ngClass="simple mat-select-content" *ngFor="let pres of filteredComplementary | async"
+                                            [value]="pres">
+                                            <span style="float: left;">{{ pres.activePrinciple}}</span>
+                                        </md-option>
+                                    </md-autocomplete>
+                                </md-form-field>
+                                <div *ngIf="isSpecialtyModules('SYMPTOM')" class="col-md-12 form-group form-black is-empty"
+                                    [class.label-floating]="!id && !model.symptom" style="display: inline-block;margin-top:0;">
+                                    <label for="prescriptionValue" class="control-label">Resultado</label>
+                                    <textarea type="text" id="prescriptionValue" name="prescriptionValue" [(ngModel)]="complementary.prescriptionValue"
+                                        #prescriptionValue="ngModel" rows="2" maxlength="2000" class="note form-control">
+
+                                    </textarea>
+                                    <span mdSuffix style="float:right">{{complementary.prescriptionValue ?
+                                        complementary.prescriptionValue.length : '0'}} /2000&nbsp;</span>
+                                </div>
+                                <button (click)="addComplementary(complementaryCtrl.value)" [disabled]="!comstudies"
+                                    style="margin-top: 0px;float:right;" class="btn btn-primary">Aceptar</button>
+                            </div>
+                        </div>
+                        <div *ngIf="complementaryStudies && complementaryStudies.length > 0 && isSpecialtyModules('STUDIES')"
+                            class="col-md-6 col-xs-12 card card-fixed scrolleable" style="height:300px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Resumen Estudios
+                                    Complement.</h5>
+                            </div>
+                            <!-- <h5>Estudios Complementarios</h5> -->
+                            <table class="table table-hover">
+                                <thead>
+                                    <th>Estudio Complementario</th>
+                                    <th>Resultado</th>
+                                    <th>Acción</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of complementaries;let i = index" style="cursor: pointer;">
+                                        <td (click)="openRowComplementary(row,i)">{{row.vademecum.activePrinciple}}</td>
+                                        <td (click)="openRowComplementary(row,i)">{{row.prescriptionValue}}</td>
+                                        <td>
+                                            <i style="color: #f56262" *ngIf="row.status != 'BAJ'" (click)="deleteComplementary(row,i)"
+                                                title="Eliminar" class="material-icons">delete</i>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="!complementaries || complementaries.length == 0" style="text-align: center;">
+                                        <td colspan="7">No hay Estudios Complementarios</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div *ngIf="vademecumValues && vademecumValues.length > 0 && isSpecialtyModules('PRESCRIPTING')"
+                            class="col-md-6 col-xs-12 card card-fixed" style="height:400px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Prescripciones</h5>
+                            </div>
+                            <!-- <h5>Prescripciones</h5> -->
+                            <div class="card-content">
+                                <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white;">
+                                    <input mdInput placeholder="Prescripción" aria-label="Prescripción"
+                                        [mdAutocomplete]="auto" [formControl]="vademecumCtrl" [(ngModel)]="vademecum"
+                                        #prescriptionVal>
+                                    <md-autocomplete #auto="mdAutocomplete" [displayWith]="displayVade.bind(this)">
+                                        <md-option ngClass="simple mat-select-content" *ngFor="let pres of filteredVademecum | async"
+                                            [value]="pres">
+                                            <span style="float: left;">{{ pres.activePrinciple}}</span>
+                                        </md-option>
+                                    </md-autocomplete>
+                                </md-form-field>
+                                <div class="col-md-12">
+                                    <md-form-field class="form-group form-black is-empty col-md-4">
+                                        <input mdInput placeholder="Administrar" type="text" id="amount" name="amount"
+                                            [(ngModel)]="prescription.amount" #amounts="ngModel" maxlength="5" (focus)="clearSign($event)"
+                                            (keydown)="ctrlKeyDown($event)" />
+                                    </md-form-field>
+                                    <div class="form-group form-black is-empty col-md-4" style="margin: 20px 0 0 0; padding: 7px 0 0 0;">
+                                        <md-select class="col-md-2" [color]="selectTheme" id="posologia" name="posologia"
+                                            [(ngModel)]="posologia" #posologias="ngModel" style="padding: 0;"
+                                            placeholder="Unidades">
+                                            <md-option *ngFor="let poso of posoMedidas" [value]="poso.code">
+                                                {{poso.code}}
+                                            </md-option>
+                                        </md-select>
+                                    </div>
+                                    <md-form-field class="form-group form-black is-empty col-md-4">
+                                        <input mdInput placeholder="Frecuencia" type="number" id="frecuency" name="frecuency"
+                                            [(ngModel)]="prescription.frecuency" #frecuency="ngModel" style="text-align:right;" />
+                                        <span mdSuffix>Hs&nbsp;</span>
+                                    </md-form-field>
+                                    <md-form-field class="form-group form-black is-empty col-md-4">
+                                        <input mdInput placeholder="Duración" type="number" id="duration" name="duration"
+                                            [(ngModel)]="prescription.duration" #duration="ngModel" />
+                                        <span mdSuffix>Días&nbsp;</span>
+                                    </md-form-field>
+                                    <div class="form-group form-black checkbox col-md-3" style="padding-top: 15px">
+                                        <label>
+                                            <input type="checkbox" id="refill" name="refill" [(ngModel)]="prescription.refill"
+                                                #refill="ngModel"> Medic. Crónica.
+                                        </label>
+                                    </div>
+                                    <md-form-field *ngIf="prescription.refill" class="form-group form-black is-empty col-md-4">
+                                        <input mdInput placeholder="Cantidad" type="number" id="refillValue" name="refillValue"
+                                            [(ngModel)]="prescription.refillValue" #refillValue="ngModel" />
+                                        <span mdSuffix>Meses&nbsp;</span>
+                                    </md-form-field>
+                                    <button (click)="addPrescription(vademecumCtrl.value)" [disabled]="!vademecum || !prescription.amount || !prescription.duration || !prescription.frecuency || !posologia"
+                                        style="margin-top: 40px;float:right;" class="btn btn-primary">Aceptar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div *ngIf="vademecumValues && vademecumValues.length > 0" class="col-md-6 col-xs-12 card card-fixed" style="overflow:scroll;height:300px"> -->
+                        <div *ngIf="vademecumValues && vademecumValues.length > 0 && isSpecialtyModules('PRESCRIPTING')"
+                            class="col-md-6 col-xs-12 card card-fixed scrolleable" style="height:400px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Resumen Prescripciones</h5>
+                            </div>
+                            <!-- <h5>Prescripciones</h5> -->
+                            <table class="table table-hover">
+                                <thead>
+                                    <th>Prescripción</th>
+                                    <th>Administrar</th>
+                                    <th>Frecuencia</th>
+                                    <th>Duración</th>
+                                    <th>Medic. Crónica</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of prescriptions;let i = index" style="cursor: pointer;">
+                                        <!-- <td (click)="openRowPrescription(row,i)" *ngIf="row.vademecum.needsAuthorization" style="background-color: #e67b7e52"> -->
+                                        <td *ngIf="row.vademecum.needsAuthorization" style="background-color: #e67b7e52">
+                                            {{row.vademecum.activePrinciple}}
+                                        </td>
+                                        <!-- <td (click)="openRowPrescription(row,i)" *ngIf="!row.vademecum.needsAuthorization"> -->
+                                        <td *ngIf="!row.vademecum.needsAuthorization">
+                                            {{row.vademecum.activePrinciple}}
+                                        </td>
+                                        <!-- <td (click)="openRowPrescription(row,i)" *ngIf="row.vademecum.needsAuthorization" style="background-color: #e67b7e52"> -->
+                                        <td *ngIf="row.vademecum.needsAuthorization" style="background-color: #e67b7e52">
+                                            {{row.amount}}
+                                        </td>
+                                        <!-- <td (click)="openRowPrescription(row,i)" *ngIf="!row.vademecum.needsAuthorization"> -->
+                                        <td *ngIf="!row.vademecum.needsAuthorization">
+                                            {{row.amount}}
+                                        </td>
+                                        <!-- <td (click)="openRowPrescription(row,i)" *ngIf="row.vademecum.needsAuthorization" style="background-color: #e67b7e52"> -->
+                                        <td *ngIf="row.vademecum.needsAuthorization" style="background-color: #e67b7e52">
+                                            {{row.frecuency + ' Hs'}}
+                                        </td>
+                                        <!-- <td (click)="openRowPrescription(row,i)" *ngIf="!row.vademecum.needsAuthorization"> -->
+                                        <td *ngIf="!row.vademecum.needsAuthorization">
+                                            {{row.frecuency + ' Hs'}}
+                                        </td>
+                                        <!-- <td (click)="openRowPrescription(row,i)" *ngIf="row.vademecum.needsAuthorization" style="background-color: #e67b7e52"> -->
+                                        <td *ngIf="row.vademecum.needsAuthorization" style="background-color: #e67b7e52">
+                                            {{row.duration + ' días'}}
+                                        </td>
+                                        <!-- <td (click)="openRowPrescription(row,i)" *ngIf="!row.vademecum.needsAuthorization"> -->
+                                        <td *ngIf="!row.vademecum.needsAuthorization">
+                                            {{row.duration + ' días'}}
+                                        </td>
+                                        <td *ngIf="row.vademecum.needsAuthorization" style="background-color: #e67b7e52">
+                                            {{row.refillValue ? (row.refillValue + ' Meses') : ''}}
+                                        </td>
+                                        <!-- <td (click)="openRowPrescription(row,i)" *ngIf="!row.vademecum.needsAuthorization"> -->
+                                        <td *ngIf="!row.vademecum.needsAuthorization">
+                                            {{row.refillValue ? (row.refillValue + ' Meses') : ''}}
+                                        </td>
+                                        <td>
+                                            <i style="color: #f56262" *ngIf="row.status != 'BAJ'" (click)="deletePrescription(row,i)"
+                                                title="Eliminar" class="material-icons">delete</i>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="!prescriptions || prescriptions.length == 0" style="text-align: center;">
+                                        <td colspan="7">No hay prescripciones</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!--
+                            OFTALMOLOGIA
+                        -->
+                        <div *ngIf="examinationOphthalmologyDto && examinationOphthalmologyDto[0] && isSpecialtyModules('EXAM_OFTALMOLOGY')"
+                            class="col-md-6 col-xs-6 card card-fixed" style="height: 655px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Agudeza Visual</h5>
+                            </div>
+                            <!-- <h5>OFTALMOLOGIA</h5> -->
+                            <!-- <div class="card-content"> -->
+                            <div class="col-md-12">
+                                <md-form-field class="form-group form-black is-empty col-md-6" style="margin-top: 0px;">
+                                    <span mdPrefix>O.D.&nbsp;</span>
+                                    <input (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="2" id="od" name="od" [(ngModel)]="examinationOphthalmologyDto[0].examValue"
+                                        #refillValue="ngModel" style="text-align: right;" />
+                                    <span mdSuffix>/10&nbsp;</span>
+                                </md-form-field>
+                                <div style="margin: 20px 0 0 0;">
+                                    <label style="margin: 0px 30px;">
+                                        <input type="radio" id="odsccc1" name="odsccc" value="SC" [(ngModel)]="examinationOphthalmologyDto[1].examValue">
+                                        SC
+                                    </label>
+                                    <label style="margin: 0px 30px; ">
+                                        <input type="radio" id="odsccc2" name="odsccc" value="CC" [(ngModel)]="examinationOphthalmologyDto[1].examValue">
+                                        CC
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <md-form-field class="form-group form-black is-empty col-md-6" style="margin-top: 0px;">
+                                    <span mdPrefix>O.I.&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="2" id="oi" name="oi" [(ngModel)]="examinationOphthalmologyDto[2].examValue"
+                                        #refillValue="ngModel" style="text-align: right;" />
+                                    <span mdSuffix>/10&nbsp;</span>
+                                </md-form-field>
+                                <div style="margin: 20px 0 0 0;">
+                                    <label style="margin: 0px 30px;">
+                                        <input type="radio" id="oisccc" name="oisccc" value="SC" [(ngModel)]="examinationOphthalmologyDto[3].examValue">
+                                        SC
+                                    </label>
+                                    <label style="margin: 0px 30px; ">
+                                        <input type="radio" id="oisccc2" name="oisccc" value="CC" [(ngModel)]="examinationOphthalmologyDto[3].examValue">
+                                        CC
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- </div> -->
+                            <h5>Vision de Colores (Tabla de Ishihara)</h5>
+                            <div style="margin: 20px 0 0 0;">
+                                <label style="margin: 0px 30px;">
+                                    <input type="radio" id="tabla" name="tabla" value="NORMAL" [(ngModel)]="examinationOphthalmologyDto[4].examValue">
+                                    NORMAL
+                                </label>
+                                <label style="margin: 0px 30px; ">
+                                    <input type="radio" id="tabla2" name="tabla" value="ANORMAL" [(ngModel)]="examinationOphthalmologyDto[4].examValue">
+                                    ANORMAL
+                                </label>
+                            </div>
+
+                            <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !tejidoDescripcion"
+                                style="display: inline-block;">
+                                <label for="tejidoDescripcion" class="control-label">Fondo de Ojo</label>
+                                <textarea type="text" id="fondo" name="fondo" [(ngModel)]="examinationOphthalmologyDto[5].examValue"
+                                    #fondos="ngModel" class="note form-control" rows="4" maxlength="2000" required>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{examinationOphthalmologyDto[5] ?
+                                    examinationOphthalmologyDto[5].examValue.length : '0'}}
+                                    /2000&nbsp;
+                                </span>
+                            </div>
+                            <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !tejidoDescripcion"
+                                style="display: inline-block;">
+                                <label for="tejidoDescripcion" class="control-label">Observaciones</label>
+                                <textarea type="text" id="observac" name="observac" [(ngModel)]="examinationOphthalmologyDto[6].examValue"
+                                    #observac="ngModel" class="note form-control" rows="4" maxlength="2000" required>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{examinationOphthalmologyDto[6] ?
+                                    examinationOphthalmologyDto[6].examValue.length : '0'}}
+                                    /2000&nbsp;
+                                </span>
+                            </div>
+                        </div>
+                        <div *ngIf="examinationOphthalmologyDto && examinationOphthalmologyDto[0] && isSpecialtyModules('EXAM_OFTALMOLOGY')"
+                            class="col-md-6 col-xs-6 card card-fixed" style="height: 655px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Biomicroscopia</h5>
+                            </div>
+                            <!-- <h5>Biomicroscopia</h5> -->
+                            <!-- <div class="card-content"> -->
+                            <div class="col-md-12">
+                                <md-form-field class="form-group form-black is-empty col-md-6" style="margin-top: 0px;">
+                                    <span mdPrefix>O.D.&nbsp;</span>
+                                    <input mdInput placeholder="" (keydown)="ctrlKeyDown($event)" type="text" maxlength="6" id="odmmhg" name="odmmhg" [(ngModel)]="examinationOphthalmologyDto[7].examValue"
+                                        #odmmhg="ngModel" style="text-align: right;" />
+                                    <span mdSuffix>mmHg&nbsp;</span>
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-6" style="margin-top: 0px;">
+                                    <input mdInput placeholder="Horas" type="time" id="hourOD" [(ngModel)]="examinationOphthalmologyDto[8].examValue"
+                                        #hourODs="ngModel" />
+                                </md-form-field>
+                                <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !observacionBIOD"
+                                    style="display: inline-block;margin-top:0px">
+                                    <label for="observacionBIOD" class="control-label">Observación</label>
+                                    <textarea type="text" id="tipomarca" name="tipomarca" [(ngModel)]="examinationOphthalmologyDto[17].examValue"
+                                        #tipomarca="ngModel" class="note form-control" rows="2" maxlength="500"
+                                        required>
+
+                                </textarea>
+                                    <span mdSuffix style="float:right">{{examinationOphthalmologyDto[17] ?
+                                        examinationOphthalmologyDto[17].examValue.length : '0'}}
+                                        /500&nbsp;
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <md-form-field class="form-group form-black is-empty col-md-6" style="margin-top: 0px;">
+                                    <span mdPrefix>O.I.&nbsp;</span>
+                                    <input mdInput placeholder="" (keydown)="ctrlKeyDown($event)" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="examinationOphthalmologyDto[9].examValue"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <span mdSuffix>mmHg&nbsp;</span>
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-6" style="margin-top: 0px;">
+                                    <input mdInput placeholder="Horas" type="time" id="hourOI" [(ngModel)]="examinationOphthalmologyDto[10].examValue"
+                                        #hourOIs="ngModel" />
+                                </md-form-field>
+                                <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !observacionBIOI"
+                                    style="display: inline-block;margin-top:0px">
+                                    <label for="observacionBIOI" class="control-label">Observación</label>
+                                    <textarea type="text" id="tipomarca" name="tipomarca" [(ngModel)]="examinationOphthalmologyDto[18].examValue"
+                                        #tipomarca="ngModel" class="note form-control" rows="2" maxlength="500"
+                                        required>
+
+                                </textarea>
+                                    <span mdSuffix style="float:right">{{examinationOphthalmologyDto[18] ?
+                                        examinationOphthalmologyDto[18].examValue.length : '0'}}
+                                        /500&nbsp;
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- </div> -->
+                            <h5>Tonómetro</h5>
+                            <div style="margin: 20px 0 0 0;">
+                                <label style="margin: 0px 30px;">
+                                    <input type="radio" id="isweek" name="isweek" value="APLANACION" [(ngModel)]="examinationOphthalmologyDto[11].examValue">
+                                    APLANACIÓN
+                                </label>
+                                <label style="margin: 0px 30px; ">
+                                    <input type="radio" id="isweek" name="isweek" value="AIRE" [(ngModel)]="examinationOphthalmologyDto[11].examValue">
+                                    AIRE
+                                </label>
+                                <label style="margin: 0px 30px; ">
+                                    <input type="radio" id="isweek" name="isweek" value="REBOTE" [(ngModel)]="examinationOphthalmologyDto[11].examValue">
+                                    REBOTE
+                                </label>
+                            </div>
+
+                            <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !tejidoDescripcion"
+                                style="display: inline-block;">
+                                <label for="tejidoDescripcion" class="control-label">TIPO/MARCA</label>
+                                <textarea type="text" id="tipomarca" name="tipomarca" [(ngModel)]="examinationOphthalmologyDto[12].examValue"
+                                    #tipomarca="ngModel" class="note form-control" rows="4" maxlength="2000" required>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{examinationOphthalmologyDto[12] ?
+                                    examinationOphthalmologyDto[12].examValue.length : '0'}}
+                                    /2000&nbsp;
+                                </span>
+                            </div>
+                        </div>
+                        <div *ngIf="examinationOphthalmologyDto && examinationOphthalmologyDto[0] && isSpecialtyModules('EXAM_OFTALMOLOGY')"
+                            class="col-md-6 col-xs-6 card card-fixed" style="height: 660px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Movilidad Ocular</h5>
+                            </div>
+                            <!-- <h5>Movilidad Ocular</h5> -->
+                            <!-- <div class="card-content"> -->
+                            <div class="col-md-12">
+                                <md-form-field class="form-group form-black is-empty col-md-6" style="margin-top: 0px;">
+                                    <!-- <span mdPrefix>O.D.&nbsp;</span> -->
+                                    <input mdInput placeholder="Hirschsberg" (keydown)="ctrlKeyDown($event)" type="text" maxlength="6" id="hirschsberg" name="hirschsberg"
+                                        [(ngModel)]="examinationOphthalmologyDto[13].examValue" #hirschsberg="ngModel"
+                                        style="text-align: right;" />
+                                    <span mdSuffix>º&nbsp;</span>
+                                </md-form-field>
+                            </div>
+                            <div class="col-md-12">
+                                <h5>Convertest</h5>
+                                <label style="margin: 0px 30px;">
+                                    <input type="radio" id="convert" name="convert" value="+" [(ngModel)]="examinationOphthalmologyDto[14].examValue">
+                                    (+)
+                                </label>
+                                <label style="margin: 0px 30px; ">
+                                    <input type="radio" id="convert2" name="convert" value="-" [(ngModel)]="examinationOphthalmologyDto[14].examValue">
+                                    (-)
+                                </label>
+                            </div>
+                            <!-- </div> -->
+
+                            <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !tejidoDescripcion"
+                                style="display: inline-block;">
+                                <label for="movilidad" class="control-label">Movilidad</label>
+                                <textarea type="text" id="movilidad" name="movilidad" [(ngModel)]="examinationOphthalmologyDto[15].examValue"
+                                    #movilidad="ngModel" class="note form-control" rows="4" maxlength="2000" required>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{examinationOphthalmologyDto[15] ?
+                                    examinationOphthalmologyDto[15].examValue.length : '0'}}
+                                    /2000&nbsp;
+                                </span>
+                            </div>
+                            <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !tejidoDescripcion"
+                                style="display: inline-block;">
+                                <label for="Convergencia" class="control-label">Convergencia</label>
+                                <textarea type="text" id="Convergencia" name="Convergencia" [(ngModel)]="examinationOphthalmologyDto[16].examValue"
+                                    #Convergencia="ngModel" class="note form-control" rows="4" maxlength="2000"
+                                    required>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{examinationOphthalmologyDto[16].examValue ?
+                                    examinationOphthalmologyDto[16].examValue.length
+                                    : '0'}} /2000&nbsp;</span>
+                            </div>
+                        </div>
+                        <div *ngIf="examinationOphthalmologyDto && examinationOphthalmologyDto[0] && isSpecialtyModules('EXAM_OFTALMOLOGY')"
+                            class="col-md-6 col-xs-6 card card-fixed" style="height: 660px">
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Receta de Lentes</h5>
+                            </div>
+                            <!-- <h5>Receta de Lentes</h5> -->
+                            <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white;">
+                                <input mdInput placeholder="Seleccione Prescripción" aria-label="Seleccione Prescripción"
+                                    [mdAutocomplete]="ophthalmologyP" [formControl]="ophthalCtrl" [(ngModel)]="model.ophthalmologicPrescription.vademecum"
+                                    #receta>
+                                <md-autocomplete #ophthalmologyP="mdAutocomplete" [displayWith]="displayOph.bind(this)">
+                                    <md-option ngClass="simple mat-select-content" *ngFor="let pres of filteredOphthalmology | async"
+                                        [value]="pres">
+                                        <span style="float: left;">{{ pres.activePrinciple}}</span>
+                                    </md-option>
+                                </md-autocomplete>
+                            </md-form-field>
+                            <ng-container *ngIf="model.ophthalmologicPrescription.vademecum">
+
+                                <h5>Lejos</h5>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>O.D. ESF.&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.FARRIGHT_SPHERE"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>CIL.&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.FARRIGHT_CYLINDER"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>a&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.FARRIGHT_DEGREE"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <span mdSuffix>º&nbsp;</span>
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>O.I. ESF.&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.FARLEFT_SPHERE"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>CIL.&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.FARLEFT_CYLINDER"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>a&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.FARLEFT_DEGREE"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <span mdSuffix>º&nbsp;</span>
+                                </md-form-field>
+                                <h5>Cerca</h5>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>O.D. ESF.&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.NEARRIGHT_SPHERE"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>CIL.&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.NEARRIGHT_CYLINDER"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>a&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.NEARRIGHT_DEGREE"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <span mdSuffix>º&nbsp;</span>
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>O.I. ESF.&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.NEARLEFT_SPHERE"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>CIL.&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.NEARLEFT_CYLINDER"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                </md-form-field>
+                                <md-form-field class="form-group form-black is-empty col-md-4" style="margin-top: 0px;">
+                                    <span mdPrefix>a&nbsp;</span>
+                                    <input mdInput (keydown)="ctrlKeyDown($event)" mdInput placeholder="" type="text" maxlength="6" id="oimmhg" name="oimmhg" [(ngModel)]="ophthalmologicExaminations.NEARLEFT_DEGREE"
+                                        #oimmhg="ngModel" style="text-align: right;" />
+                                    <span mdSuffix>º&nbsp;</span>
+                                </md-form-field>
+                                <span>Centros de Medición</span>
+                                <div class="col-md-12" style="text-align: center;">
+
+                                    <div class="form-group checkbox col-md-3" style="padding:0 0 0 0;margin: 5px 0 0 0">
+                                        <label>
+                                            <input type="checkbox" [(ngModel)]="ophthalmologicExaminations.MULTIFOCAL"
+                                                name="multifoca" value="MULTIFOCALES"> MULTIFOC.
+                                        </label>
+                                    </div>
+                                    <div class="form-group checkbox col-md-3" style="padding:0 0 0 0;margin: 5px 0 0 0">
+                                        <label>
+                                            <input type="checkbox" [(ngModel)]="ophthalmologicExaminations.CRIZAL" name="crizals"
+                                                value="CRIZAL"> CRIZAL
+
+                                        </label>
+                                    </div>
+                                    <div class="form-group checkbox col-md-3" style="padding:0 0 0 0;margin: 5px 0 0 0">
+                                        <label>
+
+                                            <input type="checkbox" [(ngModel)]="ophthalmologicExaminations.TRANSITION"
+                                                name="transitions" value="TRANSICION"> TRANSICIÓN
+                                        </label>
+
+                                    </div>
+                                    <div class="form-group checkbox col-md-3" style="padding:0 0 0 0;margin: 5px 0 0 0">
+                                        <label>
+
+                                            <input type="checkbox" [(ngModel)]="ophthalmologicExaminations.ACCES" name="access"
+                                                value="ACCES"> ACCES
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 form-group form-black is-empty" [class.label-floating]="!id && !tejidoDescripcion"
+                                    style="display: inline-block;">
+                                    <label for="Observaciones" class="control-label">Observaciones</label>
+                                    <textarea type="text" id="observacionesOphts" name="observacionesOphts" [(ngModel)]="ophthalmologicExaminations.OBSERVATION"
+                                        #observations="ngModel" class="note form-control" rows="3" maxlength="2000"
+                                        required>
+
+                                </textarea>
+                                    <span mdSuffix style="float:right">{{ophthalmologicExaminations.OBSERVATION ?
+                                        ophthalmologicExaminations.OBSERVATION.length
+                                        : '0'}} /2000&nbsp;</span>
+                                </div>
+
+                            </ng-container>
+                        </div>
+
+                        <!--
+                            END OFTALMOLOGIA
+                        -->
+
+
+                        <!-- <div *ngIf="complementaryStudies && complementaryStudies.length > 0" class="col-md-6 col-xs-12 card card-fixed" style="overflow:scroll;height:240px"> -->
+                        <div *ngIf="vaccinePersonGroup && vaccinePersonGroup.length > 0 && isSpecialtyModules('VACCINES')"
+                            class="col-md-6 col-xs-6 card">
+                            <!-- <div  class="col-md-6 col-xs-6 card"> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Vacunas</h5>
+                            </div>
+                            <!-- <h5>Vacunas</h5> -->
+                            <div *ngFor="let vaccine of vaccinePersonGroup" class="col-md-12" style="border-bottom: 0.5px solid rgba(104, 103, 103, 0.712); display: inline-block; margin-bottom:10px;">
+                                <div class="col-md-6">
+                                    <b>{{vaccine.name}}</b>
+                                </div>
+                                <div class="col-md-6" *ngIf="vaccine.vaccineDosages && vaccine.vaccineDosages.length > 0">
+                                    <div *ngFor="let dosage of vaccine.vaccineDosages; let i = index;">
+                                        <div class="form-group checkbox" style="margin: 5px 0 0 0">
+                                            <label>
+                                                <!-- <input data-dismiss="modal" data-toggle="modal" data-target="#modalVaccine" (click)="checked($event)" type="checkbox" class="vaccines" [id]="dosage.code"> {{dosage.name}} -->
+                                                <input (click)="checkVaccine($event)" type="checkbox" class="vaccines"
+                                                    [id]="'dosage' + dosage.id" /> {{dosage.name}}
+                                            </label>
+                                            <i style="color: #f56262; cursor:pointer;" [id]="'info_'+ dosage.id" title="Eliminar"
+                                                class="material-icons" (click)="checkLabelVaccine($event)">info
+                                                <span class="tooltiptext">Ver Información</span>
+                                            </i>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!-- <button (click)="inyectedVaccine(2)" style="margin-top: 40px;float:right;" class="btn btn-primary">Aceptar</button> -->
+                        </div>
+                        <!-- ---------------------------------------------------------------------------- -->
+                        <!-- ---------------------------------------------------------------------------- -->
+                        <!-- ---------------------------------------------------------------------------- -->
+                        <div class="col-md-12 col-xs-12" style="text-align: center;" *ngIf="adultoArriba && ninoArriba && isSpecialtyModules('ODONTOGRAM')">
+                            <div class="here" style="height:90%;">
+                                <div>
+                                    <svg *ngFor="let i of adultoArriba" height="70" [ngClass]="i.tipoDiente" width="50"
+                                        id="{{i.number}}" style="padding-top: 10px">
+                                        <text x="22" y="35">
+                                            {{i.number}}
+                                        </text>
+                                        <svg:polygon points="10,15 15,10 50,45 45,50" estado="4" id="ausente1" value="6"
+                                            class="ausente" />
+                                        <svg:polygon points="45,10 50,15 15,50 10,45" estado="4" id="ausente2" value="7"
+                                            class="ausente" />
+                                        <svg:circle cx="30" cy="30" r="16" estado="8" value="8" id="corona" class="corona" />
+                                        <svg:circle cx="30" cy="30" r="20" estado="3" value="9" class="endodoncia" />
+                                        <svg:polygon points="50,10 40,10 10,26 10,32 46,32 10,50 20,50 50,36 50,28 14,28"
+                                            estado="6" value="10" class="implante" />
+                                        <svg:polygon *ngIf="i.number <= 18" (click)="selectTeeth($event)" points="10,10 50,10 40,20 20,20"
+                                            estado="0" value="CARA_VESTIBULAR" id="CARA_VESTIBULAR" class="CARA_VESTIBULAR diente" />
+                                        <svg:polygon *ngIf="i.number <= 18" (click)="selectTeeth($event)" points="50,10 50,50 40,40 40,20"
+                                            estado="0" value="CARA_MESIAL" id="CARA_MESIAL" class="CARA_MESIAL diente" />
+                                        <svg:polygon *ngIf="i.number <= 18" (click)="selectTeeth($event)" points="50,50 10,50 20,40 40,40"
+                                            estado="0" value="CARA_PALATINA" id="CARA_PALATINA" class="CARA_PALATINA diente" />
+                                        <svg:polygon *ngIf="i.number <= 18" (click)="selectTeeth($event)" points="10,50 20,40 20,20 10,10"
+                                            estado="0" value="CARA_DISTAL" id="CARA_DISTAL" class="CARA_DISTAL diente" />
+                                        <svg:polygon *ngIf="i.number <= 18" (click)="selectTeeth($event)" points="20,20 40,20 40,40 20,40"
+                                            estado="0" value="CARA_OCLUSAL" id="CARA_OCLUSAL" class="CARA_OCLUSAL diente" />
+                                        <!---->
+                                        <svg:polygon *ngIf="i.number > 18" (click)="selectTeeth($event)" points="10,10 50,10 40,20 20,20"
+                                            estado="0" value="CARA_VESTIBULAR" id="CARA_VESTIBULAR" class="CARA_VESTIBULAR diente" />
+                                        <svg:polygon *ngIf="i.number > 18" (click)="selectTeeth($event)" points="50,10 50,50 40,40 40,20"
+                                            estado="0" value="CARA_DISTAL" id="CARA_DISTAL" class="CARA_DISTAL diente" />
+                                        <svg:polygon *ngIf="i.number > 18" (click)="selectTeeth($event)" points="50,50 10,50 20,40 40,40"
+                                            estado="0" value="CARA_PALATINA" id="CARA_PALATINA" class="CARA_PALATINA diente" />
+                                        <svg:polygon *ngIf="i.number > 18" (click)="selectTeeth($event)" points="10,50 20,40 20,20 10,10"
+                                            estado="0" value="CARA_MESIAL" id="CARA_MESIAL" class="CARA_MESIAL diente" />
+                                        <svg:polygon *ngIf="i.number > 18" (click)="selectTeeth($event)" points="20,20 40,20 40,40 20,40"
+                                            estado="0" value="CARA_OCLUSAL" id="CARA_OCLUSAL" class="CARA_OCLUSAL diente" />
+                                        <!-- <line *ngIf="i.number == 21" x1="3" y1="0" x2="3" y2="200" style="stroke:rgb(255,0,0);stroke-width:4" /> -->
+                                    </svg>
+                                </div>
+                                <div>
+                                    <svg *ngFor="let i of ninoArriba" height="70" [ngClass]="i.tipoDiente" width="50"
+                                        id="{{i.number}}" style="padding-top: 10px">
+                                        <text x="22" y="35">
+                                            {{i.number}}
+                                        </text>
+                                        <svg:polygon points="10,15 15,10 50,45 45,50" estado="4" id="ausente1" value="6"
+                                            class="ausente" />
+                                        <svg:polygon points="45,10 50,15 15,50 10,45" estado="4" id="ausente2" value="7"
+                                            class="ausente" />
+                                        <svg:circle cx="30" cy="30" r="16" estado="8" value="8" id="corona" class="corona" />
+                                        <svg:circle cx="30" cy="30" r="20" estado="3" value="9" class="endodoncia" />
+                                        <svg:polygon points="50,10 40,10 10,26 10,32 46,32 10,50 20,50 50,36 50,28 14,28"
+                                            estado="6" value="10" class="implante" />
+                                        <svg:polygon *ngIf="i.number <= 55" (click)="selectTeeth($event)" points="10,10 50,10 40,20 20,20"
+                                            estado="0" value="CARA_VESTIBULAR" id="CARA_VESTIBULAR" class="CARA_VESTIBULAR diente" />
+                                        <svg:polygon *ngIf="i.number <= 55" (click)="selectTeeth($event)" points="50,10 50,50 40,40 40,20"
+                                            estado="0" value="CARA_MESIAL" id="CARA_MESIAL" class="CARA_MESIAL diente" />
+                                        <svg:polygon *ngIf="i.number <= 55" (click)="selectTeeth($event)" points="50,50 10,50 20,40 40,40"
+                                            estado="0" value="CARA_PALATINA" id="CARA_PALATINA" class="CARA_PALATINA diente" />
+                                        <svg:polygon *ngIf="i.number <= 55" (click)="selectTeeth($event)" points="10,50 20,40 20,20 10,10"
+                                            estado="0" value="CARA_DISTAL" id="CARA_DISTAL" class="CARA_DISTAL diente" />
+                                        <svg:polygon *ngIf="i.number <= 55" (click)="selectTeeth($event)" points="20,20 40,20 40,40 20,40"
+                                            estado="0" value="CARA_OCLUSAL" id="CARA_OCLUSAL" class="CARA_OCLUSAL diente" />
+                                        <!---->
+                                        <svg:polygon *ngIf="i.number > 55" (click)="selectTeeth($event)" points="10,10 50,10 40,20 20,20"
+                                            estado="0" value="CARA_VESTIBULAR" id="CARA_VESTIBULAR" class="CARA_VESTIBULAR diente" />
+                                        <svg:polygon *ngIf="i.number > 55" (click)="selectTeeth($event)" points="50,10 50,50 40,40 40,20"
+                                            estado="0" value="CARA_DISTAL" id="CARA_DISTAL" class="CARA_DISTAL diente" />
+                                        <svg:polygon *ngIf="i.number > 55" (click)="selectTeeth($event)" points="50,50 10,50 20,40 40,40"
+                                            estado="0" value="CARA_PALATINA" id="CARA_PALATINA" class="CARA_PALATINA diente" />
+                                        <svg:polygon *ngIf="i.number > 55" (click)="selectTeeth($event)" points="10,50 20,40 20,20 10,10"
+                                            estado="0" value="CARA_MESIAL" id="CARA_MESIAL" class="CARA_MESIAL diente" />
+                                        <svg:polygon *ngIf="i.number > 55" (click)="selectTeeth($event)" points="20,20 40,20 40,40 20,40"
+                                            estado="0" value="CARA_OCLUSAL" id="CARA_OCLUSAL" class="CARA_OCLUSAL diente" />
+                                        <!-- <line *ngIf="i.number == 61" x1="3" y1="0" x2="3" y2="200" style="stroke:rgb(255,0,0);stroke-width:4" /> -->
+
+                                    </svg>
+                                </div>
+                                <hr style="background-color: #ff0000; height: 2px; width: 90%; margin-top:0; margin-bottom:0;">
+                                <div>
+                                    <svg *ngFor=" let i of ninoAbajo" height="70" [ngClass]="i.tipoDiente" width="50"
+                                        id="{{i.number}}" style="padding-bottom: 10px">
+                                        <text x="22" y="35">
+                                            {{i.number}}
+                                        </text>
+                                        <svg:polygon points="10,15 15,10 50,45 45,50" estado="4" id="ausente1" value="6"
+                                            class="ausente" />
+                                        <svg:polygon points="45,10 50,15 15,50 10,45" estado="4" id="ausente2" value="7"
+                                            class="ausente" />
+                                        <svg:circle cx="30" cy="30" r="16" estado="8" value="8" id="corona" class="corona" />
+                                        <svg:circle cx="30" cy="30" r="20" estado="3" value="9" class="endodoncia" />
+                                        <svg:polygon points="50,10 40,10 10,26 10,32 46,32 10,50 20,50 50,36 50,28 14,28"
+                                            estado="6" value="10" class="implante" />
+                                        <svg:polygon *ngIf="i.number >= 81" (click)="selectTeeth($event)" points="10,10 50,10 40,20 20,20"
+                                            estado="0" value="CARA_PALATINA" id="CARA_PALATINA" class="CARA_PALATINA diente" />
+                                        <svg:polygon *ngIf="i.number >= 81" (click)="selectTeeth($event)" points="50,10 50,50 40,40 40,20"
+                                            estado="0" value="CARA_MESIAL" id="CARA_MESIAL" class="CARA_MESIAL diente" />
+                                        <svg:polygon *ngIf="i.number >= 81" (click)="selectTeeth($event)" points="50,50 10,50 20,40 40,40"
+                                            estado="0" value="CARA_VESTIBULAR" id="CARA_VESTIBULAR" class="CARA_VESTIBULAR diente" />
+                                        <svg:polygon *ngIf="i.number >= 81" (click)="selectTeeth($event)" points="10,50 20,40 20,20 10,10"
+                                            estado="0" value="CARA_DISTAL" id="CARA_DISTAL" class="CARA_DISTAL diente" />
+                                        <svg:polygon *ngIf="i.number >= 81" (click)="selectTeeth($event)" points="20,20 40,20 40,40 20,40"
+                                            estado="0" value="CARA_OCLUSAL" id="CARA_OCLUSAL" class="CARA_OCLUSAL diente" />
+                                        <!---->
+                                        <svg:polygon *ngIf="i.number < 81" (click)="selectTeeth($event)" points="10,10 50,10 40,20 20,20"
+                                            estado="0" value="CARA_PALATINA" id="CARA_PALATINA" class="CARA_PALATINA diente" />
+                                        <svg:polygon *ngIf="i.number < 81" (click)="selectTeeth($event)" points="50,10 50,50 40,40 40,20"
+                                            estado="0" value="CARA_DISTAL" id="CARA_DISTAL" class="CARA_DISTAL diente" />
+                                        <svg:polygon *ngIf="i.number < 81" (click)="selectTeeth($event)" points="50,50 10,50 20,40 40,40"
+                                            estado="0" value="CARA_VESTIBULAR" id="CARA_VESTIBULAR" class="CARA_VESTIBULAR diente" />
+                                        <svg:polygon *ngIf="i.number < 81" (click)="selectTeeth($event)" points="10,50 20,40 20,20 10,10"
+                                            estado="0" value="CARA_MESIAL" id="CARA_MESIAL" class="CARA_MESIAL diente" />
+                                        <svg:polygon *ngIf="i.number < 81" (click)="selectTeeth($event)" points="20,20 40,20 40,40 20,40"
+                                            estado="0" value="CARA_OCLUSAL" id="CARA_OCLUSAL" class="CARA_OCLUSAL diente" />
+                                        <!-- <line *ngIf="i.number == 71" x1="3" y1="0" x2="3" y2="200" style="stroke:rgb(255,0,0);stroke-width:4" /> -->
+
+                                    </svg>
+                                </div>
+                                <div>
+                                    <svg *ngFor="let i of adultoAbajo" height="70" [ngClass]="i.tipoDiente" width="50"
+                                        id="{{i.number}}" style="padding-bottom: 10px">
+                                        <text x="22" y="35">
+                                            {{i.number}}
+                                        </text>
+                                        <svg:polygon points="10,15 15,10 50,45 45,50" estado="4" id="ausente1" value="6"
+                                            class="ausente" />
+                                        <svg:polygon points="45,10 50,15 15,50 10,45" estado="4" id="ausente2" value="7"
+                                            class="ausente" />
+                                        <svg:circle cx="30" cy="30" r="16" estado="8" value="8" id="corona" class="corona" />
+                                        <svg:circle cx="30" cy="30" r="20" estado="3" value="9" class="endodoncia" />
+                                        <svg:polygon points="50,10 40,10 10,26 10,32 46,32 10,50 20,50 50,36 50,28 14,28"
+                                            estado="6" value="10" class="implante" />
+                                        <svg:polygon *ngIf="i.number >= 41" (click)="selectTeeth($event)" points="10,10 50,10 40,20 20,20"
+                                            estado="0" value="CARA_PALATINA" id="CARA_PALATINA" class="CARA_PALATINA diente" />
+                                        <svg:polygon *ngIf="i.number >= 41" (click)="selectTeeth($event)" points="50,10 50,50 40,40 40,20"
+                                            estado="0" value="CARA_MESIAL" id="CARA_MESIAL" class="CARA_MESIAL diente" />
+                                        <svg:polygon *ngIf="i.number >= 41" (click)="selectTeeth($event)" points="50,50 10,50 20,40 40,40"
+                                            estado="0" value="CARA_VESTIBULAR" id="CARA_VESTIBULAR" class="CARA_VESTIBULAR diente" />
+                                        <svg:polygon *ngIf="i.number >= 41" (click)="selectTeeth($event)" points="10,50 20,40 20,20 10,10"
+                                            estado="0" value="CARA_DISTAL" id="CARA_DISTAL" class="CARA_DISTAL diente" />
+                                        <svg:polygon *ngIf="i.number >= 41" (click)="selectTeeth($event)" points="20,20 40,20 40,40 20,40"
+                                            estado="0" value="CARA_OCLUSAL" id="CARA_OCLUSAL" class="CARA_OCLUSAL diente" />
+                                        <!---->
+                                        <svg:polygon *ngIf="i.number < 41" (click)="selectTeeth($event)" points="10,10 50,10 40,20 20,20"
+                                            estado="0" value="CARA_PALATINA" id="CARA_PALATINA" class="CARA_PALATINA diente" />
+                                        <svg:polygon *ngIf="i.number < 41" (click)="selectTeeth($event)" points="50,10 50,50 40,40 40,20"
+                                            estado="0" value="CARA_DISTAL" id="CARA_DISTAL" class="CARA_DISTAL diente" />
+                                        <svg:polygon *ngIf="i.number < 41" (click)="selectTeeth($event)" points="50,50 10,50 20,40 40,40"
+                                            estado="0" value="CARA_VESTIBULAR" id="CARA_VESTIBULAR" class="CARA_VESTIBULAR diente" />
+                                        <svg:polygon *ngIf="i.number < 41" (click)="selectTeeth($event)" points="10,50 20,40 20,20 10,10"
+                                            estado="0" value="CARA_MESIAL" id="CARA_MESIAL" class="CARA_MESIAL diente" />
+                                        <svg:polygon *ngIf="i.number < 41" (click)="selectTeeth($event)" points="20,20 40,20 40,40 20,40"
+                                            estado="0" value="CARA_OCLUSAL" id="CARA_OCLUSAL" class="CARA_OCLUSAL diente" />
+                                        <!-- <line *ngIf="i.number == 31" x1="3" y1="0" x2="3" y2="200" style="stroke:rgb(255,0,0);stroke-width:4" /> -->
+
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="isSpecialtyModules('ODONTOGRAM')" class="card">
+                            <!-- <md-form-field class="form-group form-black is-empty col-md-3">
+                                <input mdInput placeholder="Cara" type="text" id="weight" name="weight" [(ngModel)]="caraDienteVal" #cara="ngModel" />
+                            </md-form-field> -->
+                            <md-form-field class="form-group form-black is-empty col-md-2">
+                                <input mdInput placeholder="Pieza" type="text" id="weight" name="weight" [(ngModel)]="posicionDienteVal"
+                                    #pieza="ngModel" disabled="disabled" />
+                            </md-form-field>
+                            <div class="form-group form-black is-empty col-md-3" [class.label-floating]="!profileId"
+                                style="display: inline-block;">
+                                <md-select [color]="selectTheme" id="caraDiente" name="cara" [value]="caraDienteVal"
+                                    [ngModel]="caraDienteVal" #cara="ngModel" placeholder="Cara de la Pieza"
+                                    (ngModelChange)="selectFace($event)" class="mat-select-content">
+                                    <md-option value="PIEZA_COMPLETA">
+                                        Pieza Completa
+                                    </md-option>
+                                    <md-option value="CARA_PALATINA">
+                                        Palatina
+                                    </md-option>
+                                    <md-option value="CARA_MESIAL">
+                                        Mesial
+                                    </md-option>
+                                    <md-option value="CARA_VESTIBULAR">
+                                        Vestibular
+                                    </md-option>
+                                    <md-option value="CARA_DISTAL">
+                                        Distal
+                                    </md-option>
+                                    <md-option value="CARA_OCLUSAL">
+                                        Oclusal
+                                    </md-option>
+                                </md-select>
+                            </div>
+                            <div class="form-group form-black is-empty col-md-3" style="display: inline-block;">
+                                <!-- <md-select [color]="selectTheme" id="practica" name="practica" [value]="practica" [ngModel]="practica" (ngModelChange)="selectPractica($event)"
+                                    placeholder="Practica" class="mat-select-content">
+                                    <md-option value="0">
+                                        Corona
+                                    </md-option>
+                                    <md-option value="1">
+                                        Carie Curable
+                                    </md-option>
+                                    <md-option value="2">
+                                        Carie Incurable
+                                    </md-option>
+                                    <md-option value="3">
+                                        Extracción
+                                    </md-option>
+                                    <md-option value="4">
+                                        Diente Ausente
+                                    </md-option>
+                                    <md-option value="5">
+                                        Incrustación
+                                    </md-option>
+                                </md-select> -->
+                                <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white;">
+                                    <input mdInput placeholder="Practica" aria-label="Practica" [mdAutocomplete]="odo"
+                                        [formControl]="odontogramCtrl" [ngModel]="practica" (ngModelChange)="selectPractica($event)"
+                                        #odontogramVal>
+                                    <md-autocomplete #odo="mdAutocomplete" [displayWith]="displayOdontogram.bind(this)">
+                                        <md-option ngClass="simple mat-select-content" *ngFor="let pres of filteredOdontogram | async"
+                                            [value]="pres">
+                                            <span style="float: left;">{{ pres.activePrinciple}}</span>
+                                        </md-option>
+                                    </md-autocomplete>
+                                </md-form-field>
+                            </div>
+                            <div class="radio col-md-2">
+                                <label style="margin: 10px 30px; ">
+                                    <input type="radio" id="tipo_trat" name="tipo_tratamiento" value="ACT" [(ngModel)]="status">
+                                    Trat. Anterior
+                                </label>
+                                <label style="margin: 10px 30px; ">
+                                    <input type="radio" id="tipo_trat" name="tipo_tratamiento" value="PEN" [(ngModel)]="status">
+                                    Trat. a Realizar
+                                </label>
+                            </div>
+                            <div class="form-group form-black is-empty col-md-2" [class.label-floating]="!profileId"
+                                style="display: inline-block;">
+                                <button (click)="addPractica()" [disabled]="!posicionDienteVal || !caraDienteVal || !practica"
+                                    class="btn btn-primary">Aceptar</button>
+                            </div>
+                        </div>
+
+                        <!-- <div *ngIf="practicas_ant" class="col-md-6 col-xs-12 card card-fixed " style="overflow:scroll;height:240px"> -->
+                        <div *ngIf="practicas_ant && isSpecialtyModules('ODONTOGRAM')" class="col-md-6 col-xs-12 card card-fixed scrolleable"
+                            style="height:240px">
+                            <!-- <h5>Tratamientos Anteriores</h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Tratamientos Anteriores</h5>
+                            </div>
+                            <table class="table table-hover" *ngIf="practicas">
+                                <thead>
+                                    <th>Pieza</th>
+                                    <th>Cara</th>
+                                    <th>Practica</th>
+                                    <th>Estado</th>
+                                    <th>Accion</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of practicas_ant;let i = index" style="cursor: pointer;">
+                                        <td (click)="openRowSummary(row)">{{row.pieza_valor}}</td>
+                                        <td (click)="openRowSummary(row)">{{row.examinationSubItemName}}</td>
+                                        <td (click)="openRowSummary(row)">{{row.prescriptionVademecumActivePrinciple}}</td>
+                                        <td (click)="openRowSummary(row)">{{row.status}}</td>
+                                        <td>
+                                            <i style="color: #f56262" *ngIf="row.status != 'BAJ' && row.consultationId == model.id"
+                                                (click)="deletePracticaAnt(row,i)" title="Eliminar" class="material-icons">delete
+                                                <span class="tooltiptext">Eliminar</span>
+                                            </i>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="!practicas_ant || practicas_ant.length == 0" style="text-align: center;">
+                                        <td colspan="7">El Paciente no Posee Practicas Realizadas</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- <div *ngIf="practicas" class="col-md-6 col-xs-12 card card-fixed" style="overflow:scroll;height:240px"> -->
+                        <div *ngIf="practicas && isSpecialtyModules('ODONTOGRAM')" class="col-md-6 col-xs-12 card card-fixed scrolleable"
+                            style="height:240px">
+                            <!-- <h5>Tratamientos a Realizar</h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Tratamientos a Realizar</h5>
+                            </div>
+                            <table class="table table-hover" *ngIf="practicas">
+                                <thead>
+                                    <th>Pieza</th>
+                                    <th>Cara</th>
+                                    <th>Practica</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of practicas;let i = index" style="cursor: pointer;">
+                                        <td class="td-tooltip" (click)="sendFact(row,i)">{{row.pieza_valor}}
+                                            <span class="tooltiptext">{{row.status == 'PEN' ? 'Pasar Realizado' :
+                                                'Pasar a Hacer'}}</span>
+                                        </td>
+                                        <td class="td-tooltip" (click)="sendFact(row,i)">{{row.examinationSubItemName}}
+                                            <span class="tooltiptext">{{row.status == 'PEN' ? 'Pasar Realizado' :
+                                                'Pasar a Hacer'}}</span>
+                                        </td>
+                                        <td class="td-tooltip" (click)="sendFact(row,i)">{{row.prescriptionVademecumActivePrinciple}}
+                                            <span class="tooltiptext">{{row.status == 'PEN' ? 'Pasar Realizado' :
+                                                'Pasar a Hacer'}}</span>
+                                        </td>
+                                        <td class="td-tooltip" (click)="sendFact(row,i)">{{row.status}}
+                                            <span class="tooltiptext">{{row.status == 'PEN' ? 'Pasar Realizado' :
+                                                'Pasar a Hacer'}}</span>
+                                        </td>
+                                        <td>
+                                            <i style="color: #f56262" *ngIf="row.status != 'BAJ' && row.consultationId == model.id"
+                                                (click)="deletePractica(row,i)" title="Eliminar" class="material-icons">delete
+                                                <span class="tooltiptext">Eliminar</span>
+                                            </i>
+                                        </td>
+
+                                    </tr>
+                                    <tr *ngIf="!practicas || practicas.length == 0" style="text-align: center;">
+                                        <td colspan="7">El Paciente no Posee Practicas Realizadas</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- <div class="card" *ngIf="isSpecialtyModules('STOMATOLOGY')">
+                            <div class="form-group form-black is-empty col-md-3" [class.label-floating]="!profileId"
+                                style="display: inline-block;">
+                                <md-select [color]="selectTheme" id="tejidoCara" name="tejidoCara" [value]="tejidoCaraVal"
+                                    [ngModel]="tejidoCaraVal" #caras="ngModel" placeholder="Lesión elemental y ubicación"
+                                    (ngModelChange)="selectTejido($event)" class="mat-select-content">
+                                    <md-option *ngFor="let row of stomatologyArray" [value]="row.code">
+                                        {{row.name}}
+                                    </md-option>
+                                </md-select>
+                            </div>
+                            <div class="col-md-6 form-group form-black is-empty" [class.label-floating]="!id && !tejidoDescripcion"
+                                style="display: inline-block;">
+                                <label for="tejidoDescripcion" class="control-label">Descripción</label>
+                                <textarea type="text" id="tejidoDescripcion" name="tejidoDescripcion" [(ngModel)]="tejidoDescripcion"
+                                    #tejidoDescripcions="ngModel" class="note form-control" rows="4" maxlength="1000"
+                                    required>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{tejidoDescripcion ? tejidoDescripcion.length :
+                                    '0'}} /1000&nbsp;</span>
+                            </div>
+                            <div class="form-group form-black is-empty col-md-2" [class.label-floating]="!tejidoCaraVal"
+                                style="display: inline-block;">
+                                <button (click)="addTejido()" [disabled]="!tejidoCaraVal || !tejidoDescripcion" class="btn btn-primary">Aceptar</button>
+                            </div>
+                        </div> -->
+                        <div *ngIf="practicas_ant && isSpecialtyModules('STOMATOLOGY')" class="col-md-12 col-xs-12 card scrolleable"
+                            style="height:440px">
+                            <!-- <h5></h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Estomatología</h5>
+                            </div>
+                            <div class="form-group form-black is-empty col-md-3" [class.label-floating]="!profileId"
+                                style="display: inline-block;">
+                                <md-select [color]="selectTheme" id="tejidoCara" name="tejidoCara" [value]="tejidoCaraVal"
+                                    [ngModel]="tejidoCaraVal" #caras="ngModel" placeholder="Lesión elemental y ubicación"
+                                    (ngModelChange)="selectTejido($event)" class="mat-select-content">
+                                    <md-option *ngFor="let row of stomatologyArray" [value]="row.code">
+                                        {{row.name}}
+                                    </md-option>
+                                </md-select>
+                            </div>
+                            <div class="col-md-6 form-group form-black is-empty" [class.label-floating]="!id && !tejidoDescripcion"
+                                style="display: inline-block;">
+                                <label for="tejidoDescripcion" class="control-label">Descripción</label>
+                                <textarea type="text" id="tejidoDescripcion" name="tejidoDescripcion" [(ngModel)]="tejidoDescripcion"
+                                    #tejidoDescripcions="ngModel" class="note form-control" rows="4" maxlength="1000"
+                                    required>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{tejidoDescripcion ? tejidoDescripcion.length :
+                                    '0'}} /1000&nbsp;</span>
+                            </div>
+                            <div class="form-group form-black is-empty col-md-2" [class.label-floating]="!tejidoCaraVal"
+                                style="display: inline-block;">
+                                <button (click)="addTejido()" [disabled]="!tejidoCaraVal" class="btn btn-primary">Aceptar</button>
+                            </div>
+                            <table class="table table-hover" *ngIf="tejidosBlandos">
+                                <thead>
+                                    <th>Lesión elemental y ubicación</th>
+                                    <th>Descripción</th>
+                                    <th>Fecha</th>
+                                    <th>Accion</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of tejidosBlandos;let i = index" style="cursor: pointer;">
+                                        <td (click)="openRowSummary(row)">{{row.examinationSubItemCode}}</td>
+                                        <td (click)="openRowSummary(row)">{{row.examValue}}</td>
+                                        <td (click)="openRowSummary(row)">{{row.dateExamination ? row.dateExamination :
+                                            'Nuevo'}}</td>
+                                        <td>
+                                            <i style="color: #f56262" *ngIf="row.status != 'BAJ' && row.consultationId == model.id"
+                                                (click)="deleteTejidos(row,i)" title="Eliminar" class="material-icons">delete
+                                                <span class="tooltiptext">Eliminar</span>
+                                            </i>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="!tejidosBlandos || tejidosBlandos.length == 0" style="text-align: center;">
+                                        <td colspan="7">No se encontraron Practicas en Estomatología</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- <div class="card" *ngIf="isSpecialtyModules('ODONTOLOGY_GENERAL')">
+                            <div class="form-group form-black is-empty col-md-5" [class.label-floating]="!tratGral"
+                                style="display: inline-block;">
+                                <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white;">
+                                    <input mdInput placeholder="Tratamiento Gral" aria-label="Tratamiento Gral"
+                                        [mdAutocomplete]="trat" [formControl]="tratGralCtrl" [(ngModel)]="tratGral"
+                                        #tratGrale>
+                                    <md-autocomplete #trat="mdAutocomplete" [displayWith]="displayTrat.bind(this)">
+                                        <md-option ngClass="simple mat-select-content" *ngFor="let pres of filteredTratamientosGral | async"
+                                            [value]="pres">
+                                            <span style="float: left;">{{ pres.activePrinciple}}</span>
+                                        </md-option>
+                                    </md-autocomplete>
+                                </md-form-field>
+                            </div>
+                            <div class="col-md-6 form-group form-black is-empty" [class.label-floating]="!id && !tratamientoDescripcion"
+                                style="display: inline-block;">
+                                <label for="tratamientoDescripcion" class="control-label">Descripción</label>
+                                <textarea type="text" id="tratamientoDescripcion" name="tratamientoDescripcion"
+                                    [(ngModel)]="tratamientoDescripcion" #tratamientoDescripcions="ngModel" class="note form-control"
+                                    rows="4" maxlength="1000" required>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{tratamientoDescripcion ?
+                                    tratamientoDescripcion.length : '0'}} /1000&nbsp;</span>
+                            </div>
+                            <div class="form-group form-black is-empty col-md-2" [class.label-floating]="!tejidoCaraVal"
+                                style="display: inline-block;">
+                                <button (click)="addTratamiento()" [disabled]="!tratGral || !tratamientoDescripcion"
+                                    class="btn btn-primary">Aceptar</button>
+                            </div>
+                        </div> -->
+                        <div *ngIf="practicas_ant && isSpecialtyModules('ODONTOLOGY_GENERAL')" class="col-md-12 col-xs-12 card scrolleable"
+                            style="height:440px">
+                            <!-- <h5>Tratamientos Generales</h5> -->
+                            <div class="pestaña-cabecera">
+                                <h5 style="margin-left: 20px; margin-top:0;font-weight: bold;">Tratamientos Generales</h5>
+                            </div>
+                            <div class="form-group form-black is-empty col-md-4" [class.label-floating]="!tratGral"
+                                style="display: inline-block;">
+                                <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white;">
+                                    <input mdInput placeholder="Tratamiento Gral" aria-label="Tratamiento Gral"
+                                        [mdAutocomplete]="trat" [formControl]="tratGralCtrl" [(ngModel)]="tratGral"
+                                        #tratGrale>
+                                    <md-autocomplete #trat="mdAutocomplete" [displayWith]="displayTrat.bind(this)">
+                                        <md-option ngClass="simple mat-select-content" *ngFor="let pres of filteredTratamientosGral | async"
+                                            [value]="pres">
+                                            <span style="float: left;">{{ pres.activePrinciple}}</span>
+                                        </md-option>
+                                    </md-autocomplete>
+                                </md-form-field>
+                            </div>
+                            <div class="col-md-5 form-group form-black is-empty" [class.label-floating]="!id && !tratamientoDescripcion"
+                                style="display: inline-block;">
+                                <label for="tratamientoDescripcion" class="control-label">Descripción</label>
+                                <textarea type="text" id="tratamientoDescripcion" name="tratamientoDescripcion"
+                                    [(ngModel)]="tratamientoDescripcion" #tratamientoDescripcions="ngModel" class="note form-control"
+                                    rows="4" maxlength="1000" required>
+
+                                </textarea>
+                                <span mdSuffix style="float:right">{{tratamientoDescripcion ?
+                                    tratamientoDescripcion.length : '0'}} /1000&nbsp;</span>
+                            </div>
+                            <div class="form-group form-black is-empty col-md-2" [class.label-floating]="!tejidoCaraVal"
+                                style="display: inline-block;">
+                                <button (click)="addTratamiento()" [disabled]="!tratGral" class="btn btn-primary">Aceptar</button>
+                            </div>
+                            <table class="table table-hover" *ngIf="tratamientosGral">
+                                <thead>
+                                    <th>Tratamiento</th>
+                                    <th>Descripción</th>
+                                    <th>Fecha</th>
+                                    <th>Accion</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of tratamientosGral;let i = index" style="cursor: pointer;">
+                                        <td (click)="openRowSummary(row)">{{row.prescriptionVademecumActivePrinciple}}</td>
+                                        <td (click)="openRowSummary(row)">{{row.examValue}}</td>
+                                        <td (click)="openRowSummary(row)">{{row.dateExamination ? row.dateExamination :
+                                            'Nuevo'}}</td>
+                                        <td>
+                                            <i style="color: #f56262" *ngIf="row.status != 'BAJ' && row.consultationId == model.id"
+                                                (click)="deleteTratamiento(row,i)" title="Eliminar" class="material-icons">delete
+                                                <span class="tooltiptext">Eliminar</span>
+                                            </i>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="!tratamientosGral || tratamientosGral.length == 0" style="text-align: center;">
+                                        <td colspan="7">No se encontraron Tratamientos</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- ---------------------------------------------------------------------------- -->
+                        <!-- ---------------------------------------------------------------------------- -->
+                        <!-- ---------------------------------------------------------------------------- -->
+                        <!-- VACUNAS MODAL -->
+                        <div class="modal fade" data-backdrop="false" id="modalCancel" role="dialog" aria-labelledby="modalCancel"
+                            aria-hidden="true">
+                            <div class="modal-dialog" role="document" style="width:700px">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Salir de la Consulta
+                                            <strong></strong>
+                                        </h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <span>
+                                            ¿ Desea preservar los datos de la consulta?
+                                        </span>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-primary" (click)="cancelSubmit(true)">No
+                                            Guardar</button>
+                                        <button type="button" class="btn btn-primary" (click)="onSubmit(false,true,true)">Guardar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- VACUNAS MODAL -->
+                        <div class="modal fade" data-backdrop="false" id="modalVaccine" role="dialog" aria-labelledby="modalVaccine"
+                            aria-hidden="true">
+                            <div class="modal-dialog" role="document" style="width:700px">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Datos de la Vacuna
+                                            <strong></strong>
+                                        </h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <md-form-field class="form-group form-black is-empty col-md-8">
+                                            <input mdInput placeholder="Marca" type="text" id="brand" name="brand"
+                                                [(ngModel)]="personVaccine.brand" #marca="ngModel" />
+                                        </md-form-field>
+                                        <md-form-field class="form-group form-black is-empty col-md-4">
+                                            <input mdInput placeholder="Lote" type="text" id="lot" name="lot"
+                                                [(ngModel)]="personVaccine.lot" #lote="ngModel" />
+                                        </md-form-field>
+                                        <md-form-field class="form-group form-black is-empty col-md-12">
+                                            <input mdInput placeholder="Observaciones" type="text" id="observations"
+                                                name="observations" [(ngModel)]="personVaccine.observations"
+                                                #observacion="ngModel" />
+                                        </md-form-field>
+                                        <!-- Se reprograma un turno para el Paciente:
+                                            <b>{{reproSchedule.person.lastName + ', ' + reproSchedule.person.firstName}}</b>
+                                            - DU:
+                                            <b>{{reproSchedule.person.docNumber}}</b>
+                                            <br>
+                                            <div class="form-group" style="margin: 5px 0 0 0">
+                                                <label for="priority">Para la siguiente fecha:</label>
+                                                <select placeholder="Prioridad" class="form-control" id="priority" [(ngModel)]="reproSchedule.id">
+                                                    <option *ngFor="let future of futureSchedules" [value]="future.id">
+                                                        {{ future.dateFrom}}
+                                                    </option>
+                                                </select>
+                                            </div> -->
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancelVaccine()">Cerrar</button>
+                                        <button type="button" class="btn btn-primary" (click)="addVaccine()">Aceptar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="attachment" tabindex="-1" role="dialog" aria-labelledby="Attachment"
+                            aria-hidden="true">
+                            <div style="width:700px" class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            Archivos Adjuntos
+                                        </h5>
+                                        <span style="font-size:10px">Recuerde que solo se permiten subir 3 archivos y
+                                            deben tener un tamaño menor a 10
+                                            MB cada uno.</span>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- <input type="file" multiple /> -->
+                                        <div class="box" style="text-align:center;">
+                                            <input type="file" name="file-2[]" id="file-2" class="inputfile inputfile-2"
+                                                multiple accept="image/*, application/pdf" (change)="addFiles($event)" />
+                                            <label for="file-2" style="width:250px;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17">
+                                                    <path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z" />
+                                                </svg>
+                                                <span style="font-size:16px;">Elegir Archivos&hellip;</span>
+                                            </label>
+                                        </div>
+                                        <table class="table table-hover attachment" *ngIf=" attachmentFiles && attachmentFiles.length > 0">
+                                            <thead>
+                                                <th>Archivo</th>
+                                                <th class="observations">Observacion</th>
+                                                <th>Acción</th>
+                                                <!-- <th>Razón</th> -->
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of attachmentFiles;let i = index" style="cursor: pointer;"
+                                                    (click)="downloadAttachment(row)">
+                                                    <td style="font-size: 12px">{{row.name}}</td>
+                                                    <td class="observations">
+                                                        <div *ngIf="!row.id" class="col-md-12 form-group form-black is-empty"
+                                                            [class.label-floating]="!attachmentFiles[i].observation"
+                                                            style="display: inline-block;">
+                                                            <label for="fileObs" class="control-label">Observación</label>
+                                                            <textarea type="text" id="fileObs" name="fileobs"
+                                                                [(ngModel)]="attachmentFiles[i].observation" #fileobs="ngModel"
+                                                                rows="2" maxlength="500" class="form-control">
+
+                                                            </textarea>
+                                                            <span mdSuffix style="float:right">{{attachmentFiles[i].observation
+                                                                ?
+                                                                attachmentFiles[i].observation.length :
+                                                                '0'}} /500&nbsp;</span>
+                                                        </div>
+                                                        <!-- <textarea *ngIf="!row.id" maxlength="500" [(ngModel)]="attachmentFiles[i].observation"></textarea> -->
+                                                        <span *ngIf="row.id" style="white-space: normal;">{{row.observation
+                                                            ? row.observation : ''}}</span>
+                                                    </td>
+                                                    <td class="actions">
+                                                        <i style="color: #f56262" (click)="deleteFile(row,i)" title="Eliminar"
+                                                            class="material-icons">delete</i>
+                                                    </td>
+                                                    <!-- <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.consultationReason}}</td> -->
+                                                </tr>
+                                                <tr *ngIf="!attachmentFiles || attachmentFiles.length == 0" style="text-align: center;">
+                                                    <td colspan="7">No hay Archivos Adjuntos</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" (click)="uploadFiles()">Subir
+                                            Archivos</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Historia Clínica -->
+                        <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+                            aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Historial de Consultas:
+                                            <strong>{{person.lastName + ', ' + person.firstName}}</strong>
+                                        </h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table table-hover" *ngIf="summaryPerson">
+                                            <thead>
+                                                <th>Fecha</th>
+                                                <th>Profesional</th>
+                                                <th>Razón</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of summaryPerson;let i = index" style="cursor: pointer;">
+                                                    <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog"
+                                                        (click)="openRowSummary(row)">{{row.consultationStartDate}}</td>
+                                                    <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog"
+                                                        (click)="openRowSummary(row)">{{row.professionalName}}</td>
+                                                    <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog"
+                                                        (click)="openRowSummary(row)">{{row.consultationReason}}</td>
+                                                </tr>
+                                                <tr *ngIf="!summaryPerson || summaryPerson.length == 0" style="text-align: center;">
+                                                    <td colspan="7">El Paciente no Posee Historial</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="historyDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+                            aria-hidden="true" style="overflow:scroll">
+                            <div class="modal-dialog modal-summary" role="document">
+                                <div class="modal-content" style="float:right">
+                                    <div class="modal-header" *ngIf="historyConsultation">
+                                        <h5 class="modal-title"> Profesional:
+                                            <strong>Mat. {{historyConsultation.schedule.professional.matricula + ' - '
+                                                + historyConsultation.schedule.professional.person.lastName
+                                                + ', ' + historyConsultation.schedule.professional.person.firstName}}</strong>
+                                        </h5>
+                                        <span>Iniciada el:
+                                            <strong>{{historyConsultation.startTime | date: 'EEEE, dd/MM/yy - HH:mm'}}
+                                            </strong>
+                                            - Finalizada el:
+                                            <strong>{{historyConsultation.endTime | date: 'EEEE, dd/MM/yy - HH:mm'}}</strong>
+                                        </span>
+                                        <span *ngIf="historyConsultation && historyConsultation.document.length > 0">
+                                            <br>
+                                            <br> Resumen Firmado Digitalmente:
+                                            <strong>
+                                                <span *ngFor="let row of historyConsultation.document;let i = index"
+                                                    style="cursor: pointer;">
+                                                    <!-- <td (click)="downloadAttachment(row)">{{row.name}}</td> -->
+                                                    <span *ngIf="row.code == 'DIAG'" (click)="downloadAttachment(row)">{{row.name}}
+                                                        <i class="material-icons" style="color: red; font-size: 16px; ">file_download</i>
+                                                    </span>
+                                                    <!-- <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.consultationReason}}</td> -->
+                                                </span>
+                                            </strong>
+                                        </span>
+                                    </div>
+                                    <div class="modal-body" *ngIf="historyConsultation">
+                                        <button *ngIf="historyConsultation.clapId" type="button" data-dismiss="modal"
+                                            ngClass="btn" class="btn btn-primary" (click)="goCLAP()">CLAP HISTORICO</button>
+                                        <div class="col-md-12 col-mini">
+                                            <div class="card card-mini" style="height: auto;">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <strong>Motivo de Consulta</strong>
+                                                        <br>
+                                                        <span>{{historyConsultation.reason}}</span>
+                                                    </div>
+                                                    <div>
+                                                        <strong>Sintomas</strong>
+                                                        <br>
+                                                        <span>{{historyConsultation.symptom}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-12 col-mini" *ngIf="historyConsultation && historyConsultation.document.length > 1">
+                                            <div class=" card card-mini ">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Archivos Adjuntos</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table table-hover">
+                                                            <!-- <thead>
+                                                                <th>Archivo</th>
+                                                                <th>Razón</th>
+                                                            </thead> -->
+                                                            <tbody>
+                                                                <tr *ngFor="let row of historyConsultation.document;let i = index"
+                                                                    style="cursor: pointer;">
+                                                                    <!-- <td (click)="downloadAttachment(row)">{{row.name}}</td> -->
+                                                                    <td *ngIf="row.code != 'DIAG'" (click)="downloadAttachment(row)"><a>{{row.name}}
+                                                                            - Descargar</a></td>
+                                                                    <!-- <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.consultationReason}}</td> -->
+                                                                </tr>
+                                                                <!-- <img *ngIf="filedownload" [src]="filedownload"> -->
+                                                                <!-- <a *ngIf="filedownload" [download]="'archivo.' + filename"[href]="filedownload">aaaaaaaaaa</a> -->
+                                                                <tr *ngIf="!historyConsultation.document || historyConsultation.document.length == 0"
+                                                                    style="text-align: center;">
+                                                                    <td colspan="7">No hay Archivos Adjuntos</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 col-mini" *ngIf="historyConsultation && historyConsultation.personalBackground">
+                                            <div class=" card card-mini ">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Antecedentes Personales</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <span>{{historyConsultation.personalBackground}} </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 col-mini" *ngIf="historyConsultation && historyConsultation.familyBackground">
+                                            <div class=" card card-mini ">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Antecedentes Familiares</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <span>{{historyConsultation.familyBackground}} </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-mini" *ngIf="true">
+                                            <div class="card card-mini">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Signos Vitales</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Frecuencia Cardíaca: </strong>
+                                                            <span style="float:right;">{{historyConsultation.heartRate}}
+                                                                PPM</span>
+                                                        </div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Presión Arterial: </strong>
+                                                            <span style="float:right;">{{historyConsultation.bloodPressure}}
+                                                                mmHg</span>
+                                                        </div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Frecuencia Respiratoria: </strong>
+                                                            <span style="float:right;">{{historyConsultation.breathingFrecuency}}
+                                                                RPM</span>
+                                                        </div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Temperatura Corporal: </strong>
+                                                            <span style="float:right;">{{historyConsultation.temperature}}
+                                                                ºC</span>
+                                                        </div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Altura: </strong>
+                                                            <span style="float:right;">{{historyConsultation.height}}
+                                                                CM</span>
+                                                        </div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Peso: </strong>
+                                                            <span style="float:right;">{{historyConsultation.weight}}
+                                                                KG</span>
+                                                        </div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Masa Corporal: </strong>
+                                                            <span style="float:right;">{{historyConsultation.bodyMass}}
+                                                                IMC</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="historyConsultation.percentilBrainRadioXAge" class="col-md-6 col-mini">
+                                            <div class="card card-mini">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Percentil</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Semanas / Meses: </strong>
+                                                            <span style="float:right;">{{historyConsultation.agePercentile}}
+                                                            </span>
+                                                        </div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Perímetro Cefálico por Edad: </strong>
+                                                            <span style="float:right;">{{historyConsultation.percentilBrainRadioXAge}}
+                                                            </span>
+                                                        </div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Altura por Edad : </strong>
+                                                            <span style="float:right;">{{historyConsultation.percentilHeightXWeight}}
+                                                            </span>
+                                                        </div>
+                                                        <div class="form-row col-xs-12 col-mini">
+                                                            <strong>Peso por Edad : </strong>
+                                                            <span style="float:right;">{{historyConsultation.percentilWeightXAge}}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-mini" *ngIf="historyConsultation.diagnosis && historyConsultation.diagnosis.length > 0">
+                                            <div class="card card-mini " style="display:block;overflow:scroll !important">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Diagnósticos</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <th>Descripción</th>
+                                                                <th>Estado</th>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr *ngFor="let row of historyConsultation.diagnosis;let i = index"
+                                                                    style="cursor: pointer;">
+                                                                    <td>{{row.diagnosisNomenclature.description}}</td>
+                                                                    <td>{{row.diagnosisType == 'PRE' ? 'PRESUNTIVO' :
+                                                                        'DEFINITIVO'}}</td>
+                                                                </tr>
+                                                                <tr *ngIf="!historyConsultation.diagnosis || historyConsultation.diagnosis.length == 0"
+                                                                    style="text-align: center;">
+                                                                    <td colspan="7">No hay diagnósticos</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-mini " *ngIf="historyVaccines && historyVaccines.length > 0">
+                                            <div class="card card-mini " style="display:block;overflow:scroll !important">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Vacunas</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <th>Vacuna</th>
+                                                                <th>Marca</th>
+                                                                <th>Lote</th>
+                                                                <th>Observaciónes</th>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr *ngFor="let row of historyVaccines;let i = index"
+                                                                    style="cursor: pointer;">
+                                                                    <td>{{row.vaccineDosage.name}}</td>
+                                                                    <td>{{row.brand}}</td>
+                                                                    <td>{{row.lot}}</td>
+                                                                    <td>{{row.observations}}</td>
+                                                                </tr>
+                                                                <tr *ngIf="!historyVaccines || historyVaccines.length == 0"
+                                                                    style="text-align: center;">
+                                                                    <td colspan="7">No hay vacunas</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-mini" *ngIf="historyConsultation.prescriptions && historyConsultation.prescriptions.length > 0">
+                                            <div class="card card-mini " style="display:block;overflow:scroll !important">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Prescripciones</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <th>Prescripción</th>
+                                                                <th>Administrar</th>
+                                                                <th>Frecuencia</th>
+                                                                <th>Duración</th>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr *ngFor="let row of historyConsultation.prescriptions;let i = index"
+                                                                    style="cursor: pointer;">
+                                                                    <td *ngIf="row.vademecum.benefitType == 'M'">{{row.vademecum.activePrinciple}}</td>
+                                                                    <td *ngIf="row.vademecum.benefitType == 'M'">{{row.amount}}</td>
+                                                                    <td *ngIf="row.vademecum.benefitType == 'M'">{{row.frecuency}}
+                                                                        hs</td>
+                                                                    <td *ngIf="row.vademecum.benefitType == 'M'">{{row.duration
+                                                                        + ' días - ' + (row.refill ? row.refillValue +
+                                                                        ' meses' : '')}} </td>
+                                                                </tr>
+                                                                <tr *ngIf="!historyConsultation.prescriptions || historyConsultation.prescriptions.length == 0"
+                                                                    style="text-align: center;">
+                                                                    <td colspan="7">No hay prescripciones</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-mini" *ngIf="historyConsultation.prescriptions && historyConsultation.prescriptions.length > 0">
+                                            <div class="card card-mini " style="display:block;overflow:scroll !important">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Estudios Complementarios</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <th>Estudio</th>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr *ngFor="let row of historyConsultation.prescriptions;let i = index"
+                                                                    style="cursor: pointer;">
+
+                                                                    <td *ngIf="row.vademecum.benefitType == 'P'">{{row.vademecum.activePrinciple}}</td>
+                                                                </tr>
+                                                                <tr *ngIf="!historyConsultation.prescriptions || historyConsultation.prescriptions.length == 0"
+                                                                    style="text-align: center;">
+                                                                    <td colspan="7">No hay Estudios</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-mini " *ngIf="historyConsultation.examinationValues && historyConsultation.examinationValues.length > 0">
+                                            <div class="card card-mini" style="display:block;overflow:scroll !important">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Examenes Fisicos</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <th>Examen</th>
+                                                                <th>Estado</th>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr *ngFor="let row of historyConsultation.examinationValues;let i = index"
+                                                                    style="cursor: pointer;">
+                                                                    <td>{{row.examinationItem.name}}</td>
+                                                                    <td>{{row.examValue}}</td>
+                                                                </tr>
+                                                                <tr *ngIf="!historyConsultation.examinationValues || historyConsultation.examinationValues == 0"
+                                                                    style="text-align: center;">
+                                                                    <td colspan="7">No hay examenes realizados</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-mini " *ngIf="historyConsultation.examinationOphthalmologyDto && historyConsultation.examinationOphthalmologyDto.length > 0">
+                                            <div class="card card-mini" style="display:block;overflow:scroll !important">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Examenes Oftalmologicos</strong>
+                                                        </h5>
+                                                    </div>
+                                                    <div>
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                                <th>Examen</th>
+                                                                <th>Estado</th>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr *ngFor="let row of historyConsultation.examinationOphthalmologyDto;let i = index"
+                                                                    style="cursor: pointer;">
+                                                                    <td>{{row.name}}</td>
+                                                                    <td>{{row.examValue}}</td>
+                                                                </tr>
+                                                                <tr *ngIf="!historyConsultation.examinationValues || historyConsultation.examinationOphthalmologyDto.length == 0"
+                                                                    style="text-align: center;">
+                                                                    <td colspan="7">No hay examenes realizados</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-mini " *ngIf="historyConsultation.ophthalmologicPrescription && historyConsultation.ophthalmologicPrescription.vademecum">
+                                            <div class="card card-mini" style="display:block;overflow:scroll !important">
+                                                <div class="card-content">
+                                                    <div>
+                                                        <h5>
+                                                            <strong>Receta de Lentes</strong>
+                                                        </h5>
+                                                    </div>
+
+                                                    <md-form-field class="form-group form-black is-empty col-md-12"
+                                                        style="margin-top: 0px;">
+                                                        <input readonly mdInput placeholder="" type="text" id="vademOp"
+                                                            name="vademOp" [(ngModel)]="historyConsultation.ophthalmologicPrescription.vademecum.activePrinciple"
+                                                            #vademOps="ngModel" style="text-align: center;" />
+                                                        <!-- <span mdSuffix>mmHg&nbsp;</span> -->
+                                                    </md-form-field>
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <th>Examen</th>
+                                                            <th>Valor</th>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let row of historyConsultation.ophthalmologicPrescription.examinationValues;let i = index"
+                                                                style="cursor: pointer;">
+                                                                <td>{{row.name}}</td>
+                                                                <td>{{row.examValue == 'true' ? 'SI' : row.examValue ==
+                                                                    'false'
+                                                                    ? 'NO' : row.examValue }}
+                                                                <td>
+                                                            </tr>
+                                                            <tr *ngIf="!historyConsultation.ophthalmologicPrescription.examinationValues || historyConsultation.ophthalmologicPrescription.examinationValues.length == 0"
+                                                                style="text-align: center;">
+                                                                <td colspan="7">No hay prescripciones realizadas</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

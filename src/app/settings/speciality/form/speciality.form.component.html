@@ -1,0 +1,39 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">local_hospital</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">{{title}}</h4>
+                        <div class="card-content">
+                            <form (ngSubmit)="onSubmit()" #modelForm="ngForm">
+                                <ul class="dynform">
+                                    <li class="form-row">
+                                        <div class="form-group form-black is-empty" [class.label-floating]="!id" style="display: inline-block;">
+                                            <label for="name" class="control-label">Nombre de la Especialidad</label>
+                                            <input type="text" id="name" name="name" [(ngModel)]="model.name" #name="ngModel" class="form-control" size="65" required>
+                                            <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+                                                <div *ngIf="name.errors.required">
+                                                    Nombre es requerido.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    
+                                </ul>
+                                <div class="form-row" ngClass="btn-fixed">
+                                    <button (click)="cancelSubmit()" style="margin-top: 40px;" ngClass="btn-fixed-float" class="btn"> Cancelar</button>
+                                    <button type="submit" [disabled]="!modelForm.form.valid" style="margin-top: 40px;" ngClass="btn-fixed-float" class="btn btn-primary"
+                                        style="margin-top: 40px;">{{id ? 'Modificar' : 'Crear'}} Especialidad</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

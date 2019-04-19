@@ -1,0 +1,144 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="title">{{title}}</h4>
+                        <p class="category"></p>
+                    </div>
+                    <div class="card-content">
+                        <!-- <form (ngSubmit)="onSubmit()" #modelForm="ngForm"> -->
+                        <ul class="dynform">
+                            <li class="form-row">
+                                <div class="form-group form-black is-empty " [class.label-floating]="!id" style="display: inline-block;">
+                                    <label for="name" class="control-label">Nombre del Servicio</label>
+                                    <input type="text" id="name" name="name" [(ngModel)]="model.name" #name="ngModel"
+                                        class="form-control" size="65" required>
+                                    <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+                                        <div *ngIf="name.errors.required">
+                                            Nombre es requerido.
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="form-row">
+                                <div class="form-group form-black is-empty" [class.label-floating]="!id" style="display: inline-block;">
+                                    <label for="schedule" class="control-label">Duración</label>
+                                    <input type="number" min="10" id="schedule" name="schedule" [(ngModel)]="model.duration"
+                                        #schedule="ngModel" class="form-control" size="65" required>
+                                    <div *ngIf="schedule.invalid && (schedule.dirty || schedule.touched)" class="alert alert-danger">
+                                        <div *ngIf="schedule.errors.required">
+                                            Duración es requerida.
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="form-row">
+                                <div class="form-group form-black is-empty">
+                                    <md-form-field class="example-full-width col-md-11 mat-select-content" style="background-color: white; padding: 0 15px 0 0;">
+                                        <input mdInput placeholder="Especialidad" aria-label="Especialidad"
+                                            [mdAutocomplete]="speciality" [formControl]="specialtyCtrl" [(ngModel)]="specialty">
+                                        <md-autocomplete #speciality="mdAutocomplete" [displayWith]="displayFn.bind(this)">
+                                            <md-option ngClass="simple mat-select-content" *ngFor="let diag of filteredSpecialty | async"
+                                                [value]="diag">
+                                                <span style="float: left;">{{diag.code + ' - ' +diag.name}}</span>
+                                            </md-option>
+                                        </md-autocomplete>
+                                    </md-form-field>
+                                </div>
+                                <div class="form-group form-black is-empty" [class.label-floating]="!id" style="display: inline-block;">
+                                    <label for="phone" class="control-label">Teléfono</label>
+                                    <input type="text" id="phone" name="phone" [(ngModel)]="model.phone" #phone="ngModel"
+                                        class="form-control" size="65" required>
+                                    <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" class="alert alert-danger">
+                                        <div *ngIf="phone.errors.required">
+                                            Teléfono es requerido.
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white; padding: 0 15px 0 0;">
+                                        <input mdInput placeholder="Especialidad" aria-label="Especialidad" [mdAutocomplete]="speciality" [formControl]="specialtyCtrl"
+                                            [(ngModel)]="specialty">
+                                        <md-autocomplete #speciality="mdAutocomplete" [displayWith]="displayFn.bind(this)">
+                                            <md-option ngClass="simple mat-select-content" *ngFor="let diag of filteredSpecialty | async" [value]="diag">
+                                                <span style="float: left;">{{diag.code + ' - ' +diag.name}}</span>
+                                            </md-option>
+                                        </md-autocomplete>
+                                    </md-form-field> -->
+                            <li class="form-row">
+                                <div class="form-group form-black is-empty" style="display: inline-block;">
+                                    <label for="typeService" class="control-label">Tipo de Turno</label>
+                                    <!-- select id="typeService" name="typeService" #typeService="ngModel" [(ngModel)]="model.typeService" [disabled]="id">
+                                            <option value="PRO">Programado</option>
+                                            <option value="DEM">Demanda</option>
+                                            <option value="INT">Inter-Consulta</option>
+                                        </select -->
+                                    <div class="dropdown">
+                                        <button href="#pablo" class="dropdown-toggle btn btn-primary btn-round btn-block"
+                                            data-toggle="dropdown" [disabled]="id">{{typeServiceName}}
+                                            <b class="caret"></b>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-left">
+                                            <!-- li class="dropdown-header">Centro de Salud</li -->
+                                            <li>
+                                                <a [routerLink]="" (click)="changeTypeService('PRO')">Programado</a>
+                                            </li>
+                                            <li>
+                                                <a [routerLink]="" (click)="changeTypeService('DEM')">Demanda</a>
+                                            </li>
+                                            <li>
+                                                <a [routerLink]="" (click)="changeTypeService('INT')">Inter-consulta</a>
+                                            </li>
+                                            <!-- li class="divider"></li -->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="form-row">
+                                <div class="col-md-12 form-group form-black is-empty"
+                                    [class.label-floating]="!id && !model.locationInstructions" style="display: inline-block;">
+                                    <label for="locationInstructions" class="control-label">Ubicación del Consultorio</label>
+                                    <textarea type="text" id="locationInstructions" name="locationInstructions" [(ngModel)]="model.locationInstructions" #locationInstructions="ngModel"
+                                        class="note form-control" rows="3" maxlength="1000" required>
+
+                                        </textarea>
+                                    <span mdSuffix style="float:right">{{model.locationInstructions ? model.locationInstructions.length : '0'}}
+                                        /1000&nbsp;</span>
+                                </div>
+                            </li>
+                            <li class="form-row">
+                                <div class="form-group form-black is-empty" style="display: inline-block;">
+                                    <label for="enabled">Habilitado</label>
+                                    &nbsp;
+                                    <input type="checkbox" id="enabled" name="enabled" [(ngModel)]="model.enabled"
+                                        #enabled="ngModel">
+                                </div>
+                            </li>
+                            <li class="form-row" *ngIf="model.typeService == 'INT'">
+                                <div class="form-group form-black is-empty" style="display: inline-block;">
+                                    <label for="telemedicine">Telemedicina</label>
+                                    &nbsp;
+                                    <input type="checkbox" id="telemedicine" name="telemedicine" [(ngModel)]="model.telemedicine"
+                                        #telemedicine="ngModel" [disabled]="id">
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="form-row" ngClass="btn-fixed">
+                            <button (click)="cancelSubmit()" style="margin-top: 40px;" ngClass="btn-fixed-float" class="btn">
+                                Cancelar</button>
+                            <button (click)="deleteService()" *ngIf="model.id" ngClass="btn-fixed-float" style="margin-top: 40px;"
+                                class="btn">Eliminar Servicio</button>
+                            <button (click)="onSubmit()" [disabled]="!model.name || !model.duration || !specialty || !model.typeService "
+                                ngClass="btn-fixed-float" style="margin-top: 40px;" class="btn btn-primary">{{id ?
+                                'Modificar' : 'Crear'}} Servicio</button>
+                        </div>
+                        <!-- </form> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

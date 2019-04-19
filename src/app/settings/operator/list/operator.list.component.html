@@ -1,0 +1,52 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">account_box</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">Operadores</h4>
+                        <button type="submit" class="btn btn-white btn-round btn-just-icon" (click)="showSearch()">
+                            <i class="material-icons">search</i>
+                            <div class="ripple-container"></div>
+                        </button>
+                        &nbsp;&nbsp;
+                        <button class="btn btn-primary" (click)="newOperator()">Nuevo Operador</button>
+                        <div style="margin-top: 0px;" *ngIf="showSearchInput">
+                            <input placeholder="Buscar..." class="form-control" name="search" [(ngModel)]="model.search" #search="ngModel" size="50" (keyup)="filterList()" #inputValor>
+                        </div>
+                        <div style="float: right;" *ngIf="searchResult.page && searchResult.page.totalElements > 0">
+                            {{getPagingInfo()}}
+                            &nbsp;
+                            <div (click)="moveToPage(-1)" class="aprevnext">&#8249;</div>
+                            <div (click)="moveToPage(1)" class="aprevnext">&#8250;</div>
+                        </div>
+                        <table class="table table-hover">
+                            <thead>
+                                <th>Nombre</th>
+                                <th>Documento</th>
+                                <th>Sexo</th>
+                                <th>E-Mail</th>
+                                <th>Estado</th>
+                                <!-- <th>Acción</th> -->
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of searchResultFiltered.content" style="cursor: pointer;">
+                                    <td (click)="openRow(row.id)">{{row.person !== null ? row.person.lastName + ', '+ row.person.firstName : ''}}</td>
+                                    <td (click)="openRow(row.id)">{{row.person !== null ? row.person.docNumber : ''}}</td>
+                                    <td (click)="openRow(row.id)">{{row.person !== null && row.person.sex == 'M' ? 'Masculino': 'Femenino'}}</td>
+                                    <td (click)="openRow(row.id)">{{row.email}}</td>
+                                    <td (click)="openRow(row.id)">{{row.status == 'BAJ' ? 'DE BAJA' : 'ACTIVO'}}</td>
+                                    <!-- <td><i  style="color: #f56262" *ngIf="row.status != 'BAJ'" (click)="deleteRow(row)" title="Eliminar" class="material-icons">delete<span class="tooltiptext">Eliminar</span></i></td> -->
+                                </tr>
+                                <tr *ngIf="!searchResult.content || searchResult.content.length == 0" style="text-align: center;"><td colspan="6">No se encontraron operadores</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

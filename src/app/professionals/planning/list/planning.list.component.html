@@ -1,0 +1,134 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">assignment</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">Mi Agenda</h4>
+                        <!-- <button type="submit" class="btn btn-white btn-round btn-just-icon" (click)="showSearchInput = !showSearchInput">
+                            <i class="material-icons">search</i>
+                            <div class="ripple-container"></div>
+                        </button> -->
+                        &nbsp;&nbsp;
+                        <!-- <button class="btn btn-primary" (click)="newCenter()">Nueva Consulta</button> -->
+                        <!-- <div style="margin-top: 0px;" *ngIf="showSearchInput">
+                            <input placeholder="Buscar..." class="form-control" name="search" [(ngModel)]="model.search" #search="ngModel" size="50"
+                                (keyup)="filterList($event)">
+                        </div> -->
+                        <div style="float: right;" *ngIf="searchResult.page && searchResult.page.totalElements > 0">
+                            {{getPagingInfo()}} &nbsp;
+                            <div (click)="moveToPage(-1)" class="aprevnext">&#8249;</div>
+                            <div (click)="moveToPage(1)" class="aprevnext">&#8250;</div>
+                        </div>
+                        <table class="table table-hover">
+                            <thead>
+                                <!-- <th>Matricula</th> -->
+                                <th>Profesional</th>
+                                <th>Servicio</th>
+                                <th>Turnos desde</th>
+                                <!-- <th>Teléfono</th> -->
+                                <!-- <th>Habilitado</th> -->
+                                <!-- <th>Matrícula</th> -->
+                                <th>Turnos hasta</th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of listFiltered" style="cursor: pointer;">
+                                    <!-- <td *ngIf="row.professional.person" (click)="openRow(row.id)">{{row.professional.matricula}}</td> -->
+                                    <td *ngIf="row.professional.person" data-toggle="modal" data-target="#modalPlanning"
+                                        (click)="openRow(row)">Mat.{{row.professional.matricula + ' - '
+                                        +row.professional.person.lastName + ', ' + row.professional.person.firstName}}</td>
+                                    <td *ngIf="row.professional.person" data-toggle="modal" data-target="#modalPlanning"
+                                        (click)="openRow(row)">{{row.service.name}}</td>
+                                    <td *ngIf="row.professional.person" data-toggle="modal" data-target="#modalPlanning"
+                                        (click)="openRow(row)"><b>{{row.dateFrom}}</b>
+                                    </td>
+                                    <td *ngIf="row.professional.person" data-toggle="modal" data-target="#modalPlanning"
+                                        (click)="openRow(row)"><b>{{row.dateTo}}</b>
+                                    </td>
+                                    <!-- <td (click)="openRow(row.id)">{{row.person.phone}}</td> -->
+                                    <!-- <td (click)="openRow(row.id)">{{row.status == 'ACT' ? 'SI' : 'NO'}}</td> -->
+                                    <!-- <td (click)="openRow(row.id)">{{row.matricula}}</td> -->
+                                    <!-- <td>
+                                        <i class="material-icons" (click)="deleteRow(row.id)">delete</i>
+                                    </td> -->
+                                </tr>
+                                <tr *ngIf="!searchResult || searchResult.length == 0" style="text-align: center;">
+                                    <td colspan="7">No se encontraron consultas</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalPlanning" tabindex="-1" role="dialog" aria-labelledby="modalPlanning" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="width:700px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agenda del dia
+                        <!-- <strong>{{patience.lastName + ', ' + patience.firstName}}</strong> -->
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover" *ngIf="schedules && schedules.length > 0">
+                        <thead>
+                            <th>Horario</th>
+                            <th>Servicio</th>
+                            <th>Paciente</th>
+                            <th>Edad</th>
+                            <th>Estado</th>
+                            <!--
+                        <th>Telemedicina</th>
+                        <th>Prioridad</th> -->
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of schedules;let i = index" style="cursor: pointer;">
+                                <td>
+                                    <b>{{row.scheduledDateFrom}}</b>
+                                </td>
+                                <td>{{row.service.name}}</td>
+                                <td *ngIf="row.person">{{'DU : ' + row.person.docNumber + ' - ' + row.person.lastName + ',
+                                    ' + row.person.firstName}}</td>
+                                <td *ngIf="row.person">{{row.person.age}}</td>
+                                <td *ngIf="row.person">{{row.statusLabel}}</td>
+                                <!-- <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openToday()">{{row.specialty.name}}</td>
+                            <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openToday()">{{row.telemedicine ? 'SI' : 'NO'}}</td>
+                            <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" (click)="openRowSummary(row)">{{row.priority == 1 ? 'ALTA' : 'MEDIA'}}</td>
+                            <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" *ngIf="row.priority == 1" (click)="openToday()">
+                                <i class="material-icons" style="color: rgb(219, 75, 75);font-size:40px;">arrow_drop_up
+                                    <span class="tooltiptext">Alta</span>
+                                </i>
+                            </td>
+                            <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" *ngIf="row.priority == 2" (click)="openToday()">
+                                <i class="material-icons" style="color: rgb(224, 202, 77);font-size:40px;">remove
+                                    <span class="tooltiptext">Normal</span>
+                                </i>
+                            </td>
+                            <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" *ngIf="row.priority == 3" (click)="openToday()">
+                                <i class="material-icons" style="color: rgb(70, 189, 70);font-size:40px;">arrow_drop_down
+                                    <span class="tooltiptext">Baja</span>
+                                </i>
+                            </td>
+                            <td data-dismiss="modal" data-toggle="modal" data-target="#historyDialog" *ngIf="row.priority == 3">BAJA</td> -->
+                            </tr>
+                            <tr *ngIf="!schedules || schedules.length == 0" style="text-align: center;">
+                                <td colspan="7">El Paciente no Posee Historial</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <span *ngIf="schedules.length == 0">
+                        No hay pacientes en la planificación seleccionada
+                    </span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

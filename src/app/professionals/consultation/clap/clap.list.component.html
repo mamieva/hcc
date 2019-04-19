@@ -1,0 +1,371 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">assignment</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">CLAP</h4>
+                        <h6>Historia Clínica PERINATAL - CLAP/SMR - OPS/OMS</h6>
+                        &nbsp;&nbsp;
+                        <button *ngIf="!person && createperson" class="btn btn-primary" (click)="newperson()">Nuevo Paciente</button>
+                        <div style="margin-top: 0px;" *ngIf="showSearchInput">
+                            <input placeholder="Buscar..." class="form-control" name="search" [(ngModel)]="model.search" #search="ngModel" size="50"
+                                (keyup)="filterList($event)">
+                        </div>
+                        <div style="float: right;" *ngIf="searchResult.page && searchResult.page.totalElements > 0">
+                            {{getPagingInfo()}} &nbsp;
+                            <div (click)="moveToPage(-1)" class="aprevnext">&#8249;</div>
+                            <div (click)="moveToPage(1)" class="aprevnext">&#8250;</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-content">
+                                <h4 class="card-title">Paciente</h4>
+                                <div *ngIf="!person">
+                                    <div class="form-group label-floating col-md-4" style="margin-top: 0px;">
+                                        <label class="control-label">Número de Documento</label>
+                                        <input type="text" [(ngModel)]="documentNumber" class="form-control doc-number">
+                                    </div>
+                                    <div class="radio col-md-3">
+                                        <label>
+                                            <input type="radio" name="sex" value="M" [(ngModel)]="sex"> Masculino
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="sex" value="F" [(ngModel)]="sex"> Femenino
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-white btn-round btn-just-icon col-md-1" (click)="findPerson()">
+                                        <i class="material-icons">search</i>
+                                        <div class="ripple-container"></div>
+                                    </button>
+                                </div>
+                                <div *ngIf="person" class="row" style="display: inline;">
+                                    <div class="photo col-xs-2">
+                                        <!-- <img [src]="'data:image;base64,' + person.photoBase64 | person2SafeHtml" /> -->
+                                        <img [src]="'data:image;base64,' + person.photoBase64 | clapSafeHtml" />
+                                    </div>
+                                    <div class="col-xs-9">{{person.lastName}}, {{person.firstName}}
+                                        <br/>Fecha de Nacimiento:
+                                        <b>{{person.birthDay}}</b>
+                                        <br/>DU:
+                                        <b>{{person.docNumber}}</b>
+                                        <br/>Edad:
+                                        <b>{{person.age}}</b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- start CLAP -->
+                        <div class="card">
+                            <table class="col-md-12" border="2">
+                                <!-- 1º step -->
+                                <tr style="vertical-align: top;">
+                                    <th class="col-md-3">
+                                        <md-form-field class="form-group form-black is-empty col-md-12">
+                                            <input mdInput placeholder="Dirección" type="number" id="direccion" name="heartRate" [(ngModel)]="model.heartRate" #heartRate="ngModel"
+                                                step="1">
+                                        </md-form-field>
+                                        <md-form-field class="form-group form-black is-empty col-md-6">
+                                            <input mdInput placeholder="Localidad" type="text" id="localidad" name="heartRate" [(ngModel)]="model.heartRate" #heartRate="ngModel"
+                                                step="1">
+                                        </md-form-field>
+                                        <md-form-field class="form-group form-black is-empty col-md-6">
+                                            <input mdInput placeholder="Telefono" type="number" id="telefono" name="heartRate" [(ngModel)]="model.heartRate" #heartRate="ngModel"
+                                                step="1">
+                                        </md-form-field>
+                                    </th>
+                                    <th class="col-md-1" style="padding:0">
+                                        <h6 style="margin-left: 10px">ETNIA</h6>
+                                        <input id="blanca" class="radio-custom" name="etnia" type="radio">
+                                        <label for="blanca" class="radio-custom-label">Blanca</label>
+                                        <input id="indigena" class="radio-custom" name="etnia" type="radio">
+                                        <label for="indigena" class="radio-custom-label">Indigena</label>
+                                        <input id="mestiza" class="radio-custom" name="etnia" type="radio">
+                                        <label for="mestiza" class="radio-custom-label ">Mestiza</label>
+                                        <input id="negra" class="radio-custom " name="etnia" type="radio">
+                                        <label for="negra" class="radio-custom-label ">Negra</label>
+                                        <input id="otra" class="radio-custom " name="etnia" type="radio">
+                                        <label for="otra" class="radio-custom-label">Otra</label>
+                                    </th>
+                                    <th class="col-md-1">
+                                        <h6 style="margin-left: 10px">ALFABETA</h6>
+                                        <input id="no" class="radio-custom radio-custom-yellow" name="alfabeta" type="radio">
+                                        <label for="no" class="radio-custom-label radio-custom-label-yellow">No</label>
+                                        <input id="si" class="radio-custom" name="alfabeta" type="radio">
+                                        <label for="si" class="radio-custom-label">Si</label>
+                                    </th>
+                                    <th class="col-md-1" style="padding:0">
+                                        <h6 style="margin-left: 10px">ESTUDIOS</h6>
+                                        <input id="ninguno" class="radio-custom radio-custom-yellow" name="estudios" type="radio">
+                                        <label for="ninguno" class="radio-custom-label radio-custom-label-yellow">Ninguno</label>
+                                        <input id="primaria" class="radio-custom" name="estudios" type="radio">
+                                        <label for="primaria" class="radio-custom-label">Primaria</label>
+                                        <input id="secundaria" class="radio-custom" name="estudios" type="radio">
+                                        <label for="secundaria" class="radio-custom-label">Secund.</label>
+                                        <input id="universitaria" class="radio-custom" name="estudios" type="radio">
+                                        <label for="universitaria" class="radio-custom-label">Univer.</label>
+                                        <md-form-field class="form-group form-black is-empty" style="padding: 0 5px 0 5px">
+                                            <input mdInput placeholder="Nº Años" type="number" id="heartRate" name="estudios" [(ngModel)]="model.heartRate" #heartRate="ngModel"
+                                                step="1">
+                                        </md-form-field>
+                                    </th>
+                                    <th class="col-md-1" style="padding:0">
+                                        <h6 style="margin-left: 10px">ESTADO CIVIL</h6>
+                                        <input id="casada" class="radio-custom" name="estadocivil" type="radio">
+                                        <label for="casada" class="radio-custom-label">Casada</label>
+                                        <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                        <label for="union" class="radio-custom-label">Union Estable</label>
+                                        <input id="soltera" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                        <label for="soltera" class="radio-custom-label radio-custom-label-yellow">Soltera</label>
+                                        <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                        <label for="otro" class="radio-custom-label radio-custom-label-yellow">Otro</label>
+                                        <div style="border-top: 0.5px dashed rgb(0, 0, 0);">
+                                            <span style="font-weight: normal; font-size: 12px">VIVE SOLA</span>
+                                            <input id="no" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="no" class="radio-custom-label">NO</label>
+                                            <input id="si" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="si" class="radio-custom-label radio-custom-label-yellow">SI</label>
+                                        </div>
+                                    </th>
+                                    <th class="col-md-4">
+                                        <md-form-field class="col-md-12 form-group form-black is-empty" style="margin-top: 0;">
+                                            <input mdInput placeholder="Lugar de Control" type="text" id="heartRate" name="heartRate" [(ngModel)]="model.heartRate" #heartRate="ngModel"
+                                                step="1">
+                                        </md-form-field>
+                                        <md-form-field class="col-md-12 form-group form-black is-empty" style="margin-top: 0;">
+                                            <input mdInput placeholder="Lugar de Parto/Aborto" type="text" id="heartRate" name="heartRate" [(ngModel)]="model.heartRate"
+                                                #heartRate="ngModel" step="1">
+                                        </md-form-field>
+                                        <md-form-field class="col-md-12 form-group form-black is-empty" style="margin-top: 0;">
+                                            <input mdInput placeholder="Nº Identidad" type="number" id="heartRate" name="heartRate" [(ngModel)]="model.heartRate" #heartRate="ngModel"
+                                                step="1">
+                                        </md-form-field>
+                                    </th>
+                                </tr>
+                                <!-- end 1º step -->
+                                <!--  2º step -->
+                                <tr style="vertical-align: top;">
+                                    <th colspan="6" class="col-md-3">
+                                        <h5>ANTECEDENTES</h5>
+                                        <h6>Familiares | Personales</h6>
+                                        <div class="col-md-1">
+                                            <span style="margin-right: 5px;"> NO </span>
+                                            <span style="margin-right: 10px;"> SI</span>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                        </div>
+                                        <div class="col-md-3" style="padding:0;margin-right: 6px; text-align:center">
+                                            <br>
+                                            <span style="margin-top:3px; display: inline-block"> ----- TBC ----- </span>
+                                            <br>
+                                            <span style="margin-top:3px; display: inline-block"> ----- Diabetes ----- </span>
+                                            <br>
+                                            <span style="margin-top:3px; display: inline-block"> ----- Hipertensión -----</span>
+                                            <br>
+                                            <span style="margin-top:3px; display: inline-block">----- Preeclampsia -----</span>
+                                            <br>
+                                            <span style="margin-top:3px; display: inline-block">----- Eclampsia -----</span>
+                                            <br>
+                                            <span style="margin-top:3px; display: inline-block">----- Otra cond. médica grave -----</span>
+                                        </div>
+                                        <div class="col-md-3" style="padding:0; ">
+                                            <span style="margin-right: 5px;"> NO </span>
+                                            <span style="margin-right: 10px;"> SI</span>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow"></label>
+                                        </div>
+                                        <div class="col-md-4" style="padding:0 0 0 10px">
+                                            <span style="margin-right: 5px;"> NO </span>
+                                            <span style="margin-right: 10px;"> SI</span>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">cir genitourinaria</label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">infertilidad</label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">cardiopat</label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">nefropatía</label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">violencia</label>
+                                            <br>
+                                            <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                            <label for="union" class="radio-custom-label"></label>
+                                            <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                            <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">VIH+</label>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th colspan="6" class="col-md-9">
+                                        <h6>OBSTETRICOS</h6>
+                                        <div class="col-md-2" style="padding:0">
+                                            <div class="col-md-12" style="border-radius:15px; border: 1px solid #000">
+                                                <span>ULTIMO PREVIO</span>
+                                                <br>
+                                                <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                                <label for="union" class="radio-custom-label">n/c</label>
+                                                <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                                <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">
+                                                    <2500g</label>
+                                                        <br>
+                                                        <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                                        <label for="union" class="radio-custom-label">normal</label>
+                                                        <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                                        <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">
+                                                            <sup>3</sup> 4000g</label>
+
+                                            </div>
+                                            <div class="col-md-12" style="border-radius:15px; border: 1px solid #000">
+                                                <span>antecedentes de gemelares</span>
+                                                <br>
+                                                <input id="union" class="radio-custom" name="estadocivil" type="radio">
+                                                <label for="union" class="radio-custom-label">no</label>
+                                                <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                                <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">si</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Gestas Previas" type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Abortos" type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Vaginales" type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Nacidos vivos" type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Viven" type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Emb. Ectopico" type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                            <div class="col-md-6">
+                                                <input id="otro" class="radio-custom radio-custom-yellow" name="estadocivil" type="radio">
+                                                <label for="otro" class="radio-custom-label radio-custom-label-yellow" style="font-size:12px">3 espont. consecutivos</label>
+                                            </div>
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Muertos 1era sem." type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                        </div>
+                                        <div class="col-md-10 col-md-offset-2">
+                                            <div class="col-md-2"></div>
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Partos" type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Cesáreas" type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="Nacidos Muertos" type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                            <md-form-field class="col-md-2 form-group form-black is-empty" style="margin-top: 0;">
+                                                <input mdInput placeholder="desp 1era sem." type="number" id="previous" name="previous" [(ngModel)]="model.previous" #heartRate="ngModel"
+                                                    step="1">
+                                            </md-form-field>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <!-- end 2º step -->
+                            </table>
+
+                        </div>
+                        <!-- end CLAP -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

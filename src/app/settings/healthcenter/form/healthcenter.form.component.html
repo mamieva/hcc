@@ -1,0 +1,131 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="title">{{title}}</h4>
+                        <p class="category"></p>
+                    </div>
+                    <div class="card-content">
+                        <form (ngSubmit)="onSubmit()" #centerForm="ngForm">
+                            <ul class="dynform">
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!centerId" style="display: inline-block;">
+                                        <label for="name" class="control-label">Nombre del Centro</label>
+                                        <input type="text" id="name" name="name" [(ngModel)]="center.name" #name="ngModel" class="form-control" size="65" required>
+                                        <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+                                            <div *ngIf="name.errors.required">
+                                                Nombre es requerido.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!centerId" style="display: inline-block;">
+                                        <label for="phone" class="control-label">Teléfono</label>
+                                        <input type="text" id="phone" name="phone" [(ngModel)]="center.phone" #phone="ngModel" class="form-control" size="65" required>
+                                        <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" class="alert alert-danger">
+                                            <div *ngIf="phone.errors.required">
+                                                Teléfono es requerido.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!centerId" style="display: inline-block;">
+                                        <label for="schedule" class="control-label">Horario de Atención</label>
+                                        <input type="text" id="schedule" name="schedule" [(ngModel)]="center.workingHours" #schedule="ngModel" class="form-control"
+                                            size="65" required>
+                                        <div *ngIf="schedule.invalid && (schedule.dirty || schedule.touched)" class="alert alert-danger">
+                                            <div *ngIf="schedule.errors.required">
+                                                Horario es requerido.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!centerId" style="display: inline-block;">
+                                        <label for="address" class="control-label">Dirección</label>
+                                        <input type="text" id="address" name="address" [(ngModel)]="center.address" #address="ngModel" class="form-control" size="65"
+                                            required>
+                                        <div *ngIf="address.invalid && (address.dirty || address.touched)" class="alert alert-danger">
+                                            <div *ngIf="address.errors.required">
+                                                Dirección es requerida.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-black is-empty" [class.label-floating]="!centerId" style="display: inline-block;">
+                                        <label for="nationalCode" class="control-label">Código Nacional</label>
+                                        <input type="text" id="nationalCode" name="nationalCode" [(ngModel)]="center.nationalCode" class="form-control" size="65"
+                                            required>
+                                        <!-- <div *ngIf="nationalCodes.invalid && (nationalCodes.dirty || nationalCodes.touched)" class="alert alert-danger">
+                                            <div *ngIf="nationalCodes.errors.required">
+                                                Código Nacional es requerido.
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!centerId" style="display: inline-block;">
+                                        <label for="internalCode" class="control-label">Código Interno</label>
+                                        <input type="text" id="internalCode" name="internalCode" [(ngModel)]="center.internalCode" #internalCode="ngModel" class="form-control" size="65"
+                                            required>
+                                        <div *ngIf="internalCode.invalid && (internalCode.dirty || internalCode.touched)" class="alert alert-danger">
+                                            <div *ngIf="internalCode.errors.required">
+                                                Código Interno es requerido.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <!-- <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="city" class="control-label">Localidad</label>
+                                        <select id="city" name="city" #city="ngModel" [(ngModel)]="center.city.id">
+                                            <option *ngFor="let city of cities" [value]="city.id">{{city.name}}</option>
+                                        </select>
+                                        <! input type="text" id="city" name="city" [(ngModel)]="center.city.name" #city="ngModel" class="form-control" size="65" required -->
+                                    <!--</div> -->
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!profileId" style="display: inline-block;" style="width: 70%">
+                                        <md-select [color]="selectTheme" id="city" name="city" #city="ngModel" [(ngModel)]="center.city.id" #city="ngModel"
+                                            placeholder="Seleccionar" ngClass="btn btn-primary btn-round simple">
+                                            <md-option *ngFor="let city of cities" [value]="city.id">{{city.name}}
+                                            </md-option>                                            
+                                        </md-select>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="enabled">Tiene Planificación</label>
+                                        &nbsp;
+                                        <input type="checkbox" id="isPlanning" name="isPlanning" [(ngModel)]="center.isPlanning" #isPlanning="ngModel">
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="enabled">Habilitado</label>
+                                        &nbsp;
+                                        <input type="checkbox" id="enabled" name="enabled" [(ngModel)]="center.enabled" #enabled="ngModel">
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="isPublic">Centro Público</label>
+                                        &nbsp;
+                                        <input type="checkbox" id="isPublic" name="isPublic" [(ngModel)]="center.isPublic" #isPublic="ngModel">
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="form-row" ngClass="btn-fixed">
+                                <button (click)="cancelSubmit()" style="margin-top: 40px;" ngClass="btn-fixed-float" class="btn"> Cancelar</button>
+                                <button type="submit" [disabled]="!centerForm.form.valid" class="btn btn-primary" ngClass="btn-fixed-float" style="margin-top: 40px;">{{centerId ? 'Modificar' : 'Crear'}} Centro</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

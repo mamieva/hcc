@@ -1,0 +1,47 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+              <h4 class="title">Ingrese su CIPE para firmar</h4>
+          </div>          
+          <div *ngIf="!user.options" style="text-align: center;">
+            <div class="inserte_cipe{{look}}"></div>
+            <!--<button class="btn_continuar" (click)="getCertificates()"></button>-->
+            <button type="button" class="btn btn-primary" (click)="getCertificates()" style="margin-top: 40px;" [class.look-black]="look=='BLACK'">Continuar</button>
+          </div>
+          <div *ngIf="readingCertificates" style="text-align: center;">
+            <label>Leyendo CIPE, Espere Por Favor...</label>
+          </div>
+          <div *ngIf="read" style="text-align: center;">
+            <div class="inserte_cipe{{look}}"></div>
+            <button class="btn_continuar" (click)="getCertificates()"></button>
+          </div>
+          <div class="card-content" *ngIf="user.options">
+            <form name="form" (ngSubmit)="f.form.valid && validatePIN()" #f="ngForm" novalidate>
+                <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !username.valid }">
+                    <label for="username">Certificado</label>
+                    <select [(ngModel)]="model.username" name="username" #username="ngModel" class="form-control">
+                        <option *ngFor="let opt of user.options" [value]="opt.key">{{opt.value}}</option>
+                    </select>
+                </div>
+                <div class="form-group label-floating" [ngClass]="{ 'has-error': f.submitted && !password.valid }">
+                    <label for="password" class="control-label">Contraseña</label>
+                    <input type="password" class="form-control" name="password" [(ngModel)]="model.password" #password="ngModel" required autofocus />
+                    <div [style.display]="f.submitted && !password.valid ? 'block' : 'none'" class="help-block">Contraseña es requerida</div><br/>
+                    <div class="help-block" style="color: red;" [style.display]="attempts >= 0 ? 'block' : 'none'">PIN Incorrecto, le quedan: {{attempts}} intentos</div>
+                </div>
+                <div class="form-group">
+                    
+                    <button [disabled]="loading" class="btn btn-primary" [class.look-black]="look=='BLACK'">Firmar y Enviar Consulta</button>                
+                    
+                    <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

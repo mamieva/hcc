@@ -1,0 +1,113 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">work</i>
+                    </div>
+                    <div class="card-header">
+                        <h4 class="title">{{title}}</h4>
+                        <p class="category"></p>
+                    </div>
+                    <div class="card-content">
+                        <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
+                            <ul class="dynform">
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!profileId" style="display: inline-block;">
+                                        <label for="code" class="control-label">Código</label>
+                                        <input disabled type="text" id="code" name="code" [(ngModel)]="profile.code" #code="ngModel" class="form-control" size="65" required>
+                                        <!-- <div *ngIf="code.invalid && (code.dirty || code.touched)" class="alert alert-danger">
+                                            <div *ngIf="code.errors.required">
+                                                Código es requerido.
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!profileId" style="display: inline-block;">
+                                        <label for="userName" class="control-label">Descripción</label>
+                                        <input disabled type="text" id="description" name="description" [(ngModel)]="profile.description" #description="ngModel" class="form-control"
+                                            size="65" required>
+                                        <div *ngIf="description.invalid && (description.dirty || description.touched)" class="alert alert-danger">
+                                            <div *ngIf="description.errors.required">
+                                                Descripción es requerida.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!profileId" style="display: inline-block;">
+                                        <label for="name" class="control-label">Nombre</label>
+                                        <input disabled type="text" id="name" name="name" [(ngModel)]="profile.name" #name="ngModel" class="form-control" size="65" required>
+                                        <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+                                            <div *ngIf="name.errors.required">
+                                                Nombre es requerido.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="status">Habilitado</label> &nbsp;
+                                        <input disabled type="checkbox" id="status" name="status" [(ngModel)]="profile.status" #status="ngModel">
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="form-row" ngClass="btn-fixed">
+                                <button (click)="cancelSubmit()" style="margin-top: 40px;" ngClass="btn-fixed-float" class="btn"> Cancelar</button>
+                                <button ngClass="btn-fixed-float" type="submit" [disabled]="!profileForm.form.valid" class="btn btn-primary" style="margin-top: 40px;">{{profileId ? 'Modificar' : 'Crear'}} Perfil</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <h4 class="card-title">Módulos</h4>
+                        <table class="table table-hover">
+                            <thead>
+                                <!-- <th>Id de Centro</th> -->
+                                <!-- <th>Código</th> -->
+                                <th>Nombre</th>
+                                <!-- <th>Perfil</th> -->
+                                <th>Permisos</th>
+                            </thead>
+                            <tbody *ngIf="modules || modules.length > 0">
+                                <tr *ngFor="let row of modules;let i = index" [attr.data-index]="i" style="cursor: pointer;">
+                                    <!-- <td>{{row.id}}</td> -->
+                                    <!-- <td>{{row.code}}</td> -->
+                                    <td>{{row.name}}</td>
+                                    <td>
+                                        <div class="form-group form-black is-empty" [class.label-floating]="!profileId" style="display: inline-block;" style="width: 70%">
+                                            <md-select  [color]="selectTheme" id="permission" name="permission" multiple [(ngModel)]="profile.profileRoles[i]" #permission="ngModel"
+                                                placeholder="Seleccionar" ngClass="btn btn-primary btn-round simple" [disabled]="profile.id">
+                                                <md-option [value]="row.code + '_SHOW'">
+                                                    Acceso
+                                                </md-option>
+                                                <md-option [value]="row.code + '_SELECT'">
+                                                    Lectura
+                                                </md-option>
+                                                <md-option [value]="row.code + '_CREATE'">
+                                                    Creación
+                                                </md-option>
+                                                <md-option [value]="row.code + '_UPDATE'">
+                                                    Actualización
+                                                </md-option>
+                                                <md-option [value]="row.code + '_DELETE'">
+                                                    Borrado
+                                                </md-option>
+                                            </md-select>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="!modules || modules.length == 0" style="text-align: center;">
+                                    <td colspan="6">No se encontraron Módulos.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

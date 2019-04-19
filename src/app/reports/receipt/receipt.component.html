@@ -1,0 +1,96 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">receipt</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title"> Generación de Planilla Diaria </h4>
+                        <div>
+                            <form (ngSubmit)="onSubmit()" #receiptForm="ngForm">
+                                <div class="col-xs-6">
+                                    <div class="col-xs-12">
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h4 class="card-title">Búsqueda</h4>
+                                                <div>
+                                                    <div class="form-group form-black is-empty label-floating" style="display: inline-block;">
+                                                        <md-form-field>
+                                                            <input readonly mdInput [mdDatepicker]="picker" [max]="maxDate"
+                                                                placeholder="Seleccione día" id="date" name="date"
+                                                                [(ngModel)]="receipt.date" #date="ngModel">
+                                                            <md-datepicker-toggle *ngIf="!receipt.blob" mdSuffix [for]="picker"></md-datepicker-toggle>
+                                                            <md-datepicker #picker [startAt]="receipt.date"></md-datepicker>
+                                                        </md-form-field>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="col-xs-12">
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h4 class="card-title">Profesional</h4>
+                                                <div class="row" style="display: inline;">
+                                                    <md-form-field class="example-full-width" style="width: 90%">
+                                                        <input mdInput placeholder="Seleccionar Profesional" aria-label="Profesional"
+                                                            [mdAutocomplete]="auto" [formControl]="professionalCtrl"
+                                                            name="service" id="professional" [(ngModel)]="receipt.professional"
+                                                            (ngModelChange)="selectProfessional($event)">
+                                                        <md-autocomplete #auto="mdAutocomplete" [displayWith]="displayFn.bind(this)">
+                                                            <md-option ngClass="simple mat-select-content" *ngFor="let prof of filteredProfessionals | async"
+                                                                [value]="prof" style="width: 90%; text-align: left;">
+                                                                <span style="float: left;">{{ prof.matricula + ' - ' +
+                                                                    prof.person.lastName + ', '+
+                                                                    prof.person.firstName }}
+                                                                </span>
+                                                            </md-option>
+                                                        </md-autocomplete>
+                                                    </md-form-field>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="professionalSelected.length > 0" class="col-md-12">
+                                    <h5>Profesionales Seleccionados</h5>
+                                    <div *ngFor="let row of professionalSelected; let i = index;">
+                                        <i *ngIf="!receipt.blob" (click)="deleteProfessional(i);" class="material-icons"
+                                            style="font-size: 18px;color:red; cursor: pointer; ">
+                                            <span class="tooltiptext">Quitar</span>delete</i>
+                                        <span style="font-weight: bold">{{ row.matricula + ' - ' + row.person.lastName
+                                            + ', '+
+                                            row.person.firstName }}</span>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12" style="margin-top:15px" *ngIf="receipt.blob">
+                                    <a [download]="receipt.name ? receipt.name :'PLANILLA DIARIA ' + fecha +'.pdf'"
+                                        [href]="'data:application/octet-stream;base64,' + receipt.blob | reportsSafeHtml"
+                                        (click)="reset()">Descargar PDF
+                                        <i class="material-icons" style="font-size: 40px; ">file_download</i>
+                                    </a>
+                                    <a style="margin-left: 15px" [download]="receipt.csvName ? receipt.csvName :'PLANILLA DIARIA ' + fecha +'.csv'"
+                                        [href]="'data:text/csv;charset=utf-8;base64,' + receipt.csv | reportsSafeHtml"
+                                        (click)="reset()">Descargar Excel
+                                        <i class="material-icons" style="font-size: 40px; ">file_download</i>
+                                    </a>
+                                </div>
+                                <div class="form-row">
+                                    <button type="submit" [disabled]="professionalSelected.length == 0 && !receipt.date"
+                                        class="btn btn-primary" style="margin-top: 40px;">Generar Planilla</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

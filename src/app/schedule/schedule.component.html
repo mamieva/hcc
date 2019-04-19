@@ -1,0 +1,251 @@
+<div class="main-content" id="main">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                <i class="material-icons">date_range</i>
+            </div>
+            <div class="card-content">
+                <h4 class="card-title">Agenda de Turnos</h4>
+                <div>
+                    <div class="col-xs-6">
+                        <div class="col-xs-12">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4 class="card-title" (click)="editPatience()">Paciente</h4>
+                                    <div *ngIf="!patience">
+                                        <div class="form-group label-floating col-md-6" style="margin-top: 0px;">
+                                            <label class="control-label">Número de Documento</label>
+                                            <input type="text" [(ngModel)]="documentNumber" class="form-control doc-number">
+                                        </div>
+                                        <div class="radio col-md-3">
+                                            <label>
+                                                <input type="radio" name="sex" value="M" [(ngModel)]="sex"> Masculino
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="sex" value="F" [(ngModel)]="sex"> Femenino
+                                            </label>
+                                        </div>
+                                        <button type="submit" class="btn btn-white btn-round btn-just-icon col-md-1"
+                                            (click)="findPerson()">
+                                            <i class="material-icons">search</i>
+                                            <div class="ripple-container"></div>
+                                        </button>
+                                    </div>
+                                    <div *ngIf="patience" style="display: inline;" (click)="editPatience()">
+                                        <div class="photo col-xs-2">
+                                            <img [src]="patience.photoBase64 | scheduleSafeHtml" />
+                                        </div>
+                                        <div class="col-xs-9">{{patience.lastName}}, {{patience.firstName}}
+                                            <br />DU: {{patience.docNumber}}
+                                            <br />{{patience.age}}</div>
+                                        <i *ngIf="isPlanning" class="material-icons col-xs-1" style="float: right; cursor: pointer;"
+                                            (click)="closePatience(); $event.stopPropagation();">close</i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="col-xs-12">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h4 class="card-title">Servicio</h4>
+                                    <div *ngIf="!service">
+                                        <!-- <div class="form-group col-md-10" style="margin-top: 0px;">
+                                            <input ngui-auto-complete
+                                            [(ngModel)]="model4"
+                                            placeholder="Ingrese nombre de servicio (mínimo 2 letras)"
+                                            
+                                            list-formatter="formatted_address"
+                                            path-to-data="results"
+                                            min-chars="2" class="form-control" (keyup.enter)="findService()" />
+                                        </div>-->
+                                        <div class="form-group col-md-10" style="margin-top: 0px;">
+                                            <md-form-field class="example-full-width" style="width: 90%">
+                                                <input mdInput placeholder="Servicio" aria-label="Servicio"
+                                                    [mdAutocomplete]="auto" [formControl]="serviceCtrl" name="services"
+                                                    id="services" (keyup.enter)="findService()" [(ngModel)]="schedule.service">
+                                                <md-autocomplete #auto="mdAutocomplete" [displayWith]="displayFn.bind(this)">
+                                                    <md-option ngClass="simple mat-select-content" *ngFor="let service of filteredServices | async"
+                                                        [value]="service" style="width: 90%; text-align: left;">
+                                                        <span style="float: left;font-size: 11.5px;">{{service.name }}
+                                                        </span>
+                                                    </md-option>
+                                                </md-autocomplete>
+                                            </md-form-field>
+                                        </div>
+                                        <button type="submit" class="btn btn-white btn-round btn-just-icon col-md-1"
+                                            (click)="findService()">
+                                            <i class="material-icons">search</i>
+                                            <div class="ripple-container"></div>
+                                        </button>
+                                    </div>
+                                    <div *ngIf="service" style="margin-top: 0px;">
+                                        <div class="col-xs-9">{{service.name}}
+                                            <br />Duración de Turno: {{service.duration}}</div>
+                                        <i class="material-icons col-xs-1" style="float: right; cursor: pointer;"
+                                            (click)="closeService()">close</i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-0" [style.visibility]="showCalendar ? 'visible' : 'hidden'"
+                        *ngIf="!isOnDemand">
+                        <div class="card card-calendar">
+                            <div class="card-content" class="ps-child">
+                                <div id="fullCalendar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8" *ngIf="isOnDemand">
+                        <div class="card" style="box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0.14);">
+                            <div class="card-content">
+                                <div class="col-md-2">
+                                </div>
+                                <div class="col-md-8">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Turnos a demanda</th>
+                                                <th>
+                                                    <button class="btn btn-primary" style="float: right;" (click)="assignPatience()">Asignar</button>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let row of schedules; let i = index">
+
+                                                <td *ngIf="row.status != 'CAN' && row.status != 'FIN' && row.person != null">{{row.person.lastName
+                                                    + ', ' + row.person.firstName}}</td>
+                                                <td *ngIf="row.status != 'CAN' && row.status != 'FIN' && row.person != null">
+                                                    <i class="material-icons" style="float: right; cursor: pointer;"
+                                                        (click)="removeOnDemand(row, i)">cancel</i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-1" *ngIf="schedules && schedules.length > 0 && (showCalendar)">
+                        <button class="btn btn-primary" *ngIf="showCalendar" (click)="getSchedules()">Recargar</button>
+                    </div>
+                    <div class="col-md-1" *ngIf="schedules && schedules.length > 0 && (isOnDemand)">
+                        <button class="btn btn-primary" (click)="sendChanges()">Confirmar</button>
+                        <button class="btn" (click)="discardChanges()">Descartar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="patience" class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document" style="margin-top: 30px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle"><b>{{title}}{{patience.lastName + ', ' +
+                        patience.firstName}}</b></h5>
+                <!-- h4 class="title">{{title}}{{patience.lastName + ', ' + patience.firstName}}</h4 -->
+                <!-- button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button -->
+            </div>
+            <div class="modal-body">
+                <div class="photo col-md-2">
+                    <img width="150%" [src]="patience.photoBase64 | scheduleSafeHtml" />
+                </div>
+                <form (ngSubmit)="onSubmit()" #modelForm="ngForm">
+                    <div class="col-md-1"></div>
+                    <div class="form-group form-black is-empty col-md-9" style="display: inline-block;">
+                        <label for="name" class="control-label">Documento</label>
+                        <span>{{patience.documentType}}{{' ' + patience.docNumber}}</span>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="form-group form-black is-empty col-md-4" style="display: inline-block;">
+                        <label for="name" class="control-label">Sexo</label>
+                        <span>{{patience.sex == 'M' ? 'Masculino' : 'Femenino' }}</span>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="form-group form-black is-empty col-md-4" style="display: inline-block;">
+                        <label for="name" class="control-label">Edad</label>
+                        <span>{{patience.age}}</span>
+                    </div>
+                    <div class="form-group form-black is-empty col-md-12" style="display: inline-block;">
+                        <label for="name" class="control-label">Domicilio</label>
+                        <span>{{patience.street + ' ' + patience.addressNumber + ', ' + patience.neighborhood + ', CP '
+                            + patience.postalCode}}</span>
+                    </div>
+                    <div class="form-group form-black is-empty col-md-5" style="display: inline-block;">
+                        <label for="name" class="control-label">Fecha de Nacimiento</label>
+                        <span>{{patience.birthDay}}</span>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="form-group form-black is-empty col-md-5" style="display: inline-block;">
+                        <label for="name" class="control-label">¿Tiene CIPE?</label>
+                        <span>{{patience.csn ? 'SI' : 'NO'}}</span>
+                    </div>
+                    <div class="form-group form-black is-empty col-md-12" style="display: inline-block;">
+                        <label for="name" class="control-label">Obra Social</label>
+                        <span *ngIf="patience.socialSecurity">{{patience.socialSecurity.descOs}}</span>
+                    </div>
+                    <!-- <div class="form-group form-black is-empty col-md-12" style="display: inline-block;">
+                    <label for="name" class="control-label">Alergias</label>
+                    <span>{{patience.allergies}}</span>
+                </div> -->
+                    <div class="form-group form-black is-empty col-md-12" [class.label-floating]="!patience.email "
+                        style="display: inline-block;">
+                        <label for="schedule" class="control-label">E-mail</label>
+                        <input type="email" id="schedule" name="schedule" [(ngModel)]="patience.email" #schedule="ngModel"
+                            class="form-control" size="65" required>
+                        <div *ngIf="schedule.invalid && (schedule.dirty || schedule.touched)" class="alert alert-danger">
+                            <div *ngIf="schedule.errors.required">
+                                E-mail es requerido.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-black is-empty col-md-12" [class.label-floating]="!patience.phone"
+                        style="display: inline-block;">
+                        <label for="phone" class="control-label">Teléfono</label>
+                        <input type="text" id="phone" name="phone" [(ngModel)]="patience.phone" #phone="ngModel" class="form-control"
+                            size="65" required>
+                        <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" class="alert alert-danger">
+                            <div *ngIf="phone.errors.required">
+                                Teléfono es requerido.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-black is-empty col-md-12" style="display: inline-block;">
+                        <label for="phone" class="control-label">Centro de Salud</label>
+                        <div class="dropdown">
+                            <button href="#pablo" class="dropdown-toggle btn btn-primary btn-round btn-block" style="padding-right: 90px;"
+                                data-toggle="dropdown">{{patience.healthCenter ? patience.healthCenter.name :
+                                'Seleccione'}}
+                                <b class="caret"></b>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-left" style="width:100%">
+                                <li *ngFor="let h of healthCenters" style="margin: 5px 0 0 0; font-size:15px;">
+                                    <div (click)="changeHealthCenter(h)">{{h.name}}</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+                <div class="col-md-12" style="text-align: right">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" (click)="onSubmit()" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="button" (click)="onSubmit()" class="btn btn-primary">Guardar</button> -->
+            </div>
+        </div>
+    </div>
+</div>

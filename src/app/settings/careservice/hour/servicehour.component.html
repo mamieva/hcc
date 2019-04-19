@@ -1,0 +1,88 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">local_hospital</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">Servicio: {{service.name}}</h4>
+                        <div class="form-group form-black is-empty label-floating col-md-3" style="display: inline-block; padding: 5px 0 0 0;">
+                            <!-- <label for="search" class="control-label" [style.top]="model.search || focus == 'search' ? '-18%' : '4%'">Profesional</label>
+                            <input type="text" id="search" name="search" [(ngModel)]="model.search" #search="ngModel" class="form-control" (keyup.enter)="findProfessional()" (focus)="onFocus('search')" (blur)="onFocus('')"> -->
+                            <!-- -->
+                            <md-form-field class="example-full-width col-md-12 mat-select-content" style="background-color: white;">
+                                <input mdInput placeholder="Profesional" aria-label="Profesional" [mdAutocomplete]="prof" [formControl]="professionalCtrl"
+                                    [(ngModel)]="model.professional" #examinationVal>
+                                <md-autocomplete #prof="mdAutocomplete" [displayWith]="displayFn.bind(this)">
+                                    <md-option ngClass="simple mat-select-content" *ngFor="let profesional of filteredProfessional | async" [value]="profesional">
+                                        <span style="float: left;font-size: 11.5px;">{{profesional.person.lastName + ', ' + profesional.person.firstName |uppercase}}</span>
+                                    </md-option>
+                                </md-autocomplete>
+                            </md-form-field>
+                            <!-- -->
+                        </div>
+                        <!-- <button *ngIf="!professional" type="submit" class="btn btn-white btn-round btn-just-icon col-md-1" style="width: 40px;" (click)="findProfessional()">
+                            <i class="material-icons">search</i>
+                            <div class="ripple-container"></div>
+                        </button> -->
+                        <!-- <div *ngIf="professional" class="form-group form-black is-empty label-floating col-md-3" style="display: inline-block; padding-top: 1%;">
+                            <span>{{professional.person.lastName + ', ' + professional.person.firstName}}</span>
+                            <i class="material-icons col-xs-1" style="float: right; cursor: pointer;" (click)="professional = null; model.search = '';">close</i>
+                        </div> -->
+                        <div class="form-group form-black is-empty label-floating col-md-2" style="display: inline-block;">
+                            <md-form-field>
+                                <input readonly mdInput [min]="model.date" [mdDatepicker]="picker" placeholder="Seleccione día" id="date" name="date" [(ngModel)]="model.dateFrom"
+                                    #date="ngModel">
+                                <md-datepicker-toggle mdSuffix [for]="picker"></md-datepicker-toggle>
+                                <md-datepicker #picker [startAt]="model.date"></md-datepicker>
+                            </md-form-field>
+                        </div>
+                        <div class="form-group form-black is-empty label-floating col-md-2" style="display: inline-block; padding-top: 1%;">
+                            <label for="start" class="control-label" [style.top]="'-18%'">Desde</label>
+                            <input type="time" id="start" name="start" [(ngModel)]="model.hourFrom" #start="ngModel" class="form-control" (focus)="onFocus('start')"
+                                (blur)="onFocus('')">
+                        </div>
+                        <div class="form-group form-black is-empty label-floating col-md-2" style="display: inline-block; padding-top: 1%;">
+                            <label for="end" class="control-label" [style.top]="'-18%'">Hasta</label>
+                            <input type="time" id="end" name="end" [(ngModel)]="model.hourTo" #start="ngModel" class="form-control" (focus)="onFocus('end')"
+                                (blur)="onFocus('')">
+                        </div>
+                        <div class="form-group form-black is-empty col-md-1" style="display: inline-block; padding-top: 20px; margin-right: -7%;">
+                            <input type="checkbox" id="allmonth" name="allmonth" [(ngModel)]="model.allMonth" #allmonth="ngModel">
+                            <label>Mes</label>
+                        </div>
+                        <!-- <div class="form-group form-black is-empty col-md-1" style="display: inline-block;">
+                            <button class="btn btn-primary" (click)="add()">Agregar</button>
+                        </div> -->
+                        <div class="form-group form-black is-empty col-md-1" style="margin-left: 5%;">
+                            <button class="btn btn-primary" (click)="sendChanges()">Guardar Cambios</button>
+                        </div>
+                        <table class="table table-hover">
+                            <thead>
+                                <th>Profesional</th>
+                                <th>Fecha</th>
+                                <th>Horario</th>
+                                <th>Acción</th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of hours; let i=index" [style.display]="row.removed ? 'none' : 'table-row'">
+                                    <td>{{row.professional.person.lastName + ', ' + row.professional.person.firstName}}
+                                        <td>{{formatDate(row.dateFrom)}}</td>
+                                        <td>{{row.hourFrom + ' - ' + row.hourTo}}</td>
+                                        <td>
+                                            <i class="material-icons" style="color: #f56262; cursor: pointer;" (click)="remove(i)">delete</i>
+                                        </td>
+                                </tr>
+                                <tr *ngIf="!hours || hours.length == 0" style="text-align: center;">
+                                    <td colspan="4">No se encuentran horarios cargados</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,113 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="title">{{title}}{{patience.lastName + ', ' + patience.firstName}}</h4>
+                        <p class="category"></p>
+                        <div class="photo col-xs-2">
+                            <img [src]="patience.tmpPhoto | patienceSafeHtml" />
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <i class="material-icons" style="float: right; cursor: pointer;" (click)="close()">close</i>
+                        <form (ngSubmit)="onSubmit()" #modelForm="ngForm"> 
+                            <ul class="dynform">
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty"style="display: inline-block;">
+                                        <label for="name" class="control-label">Documento</label>
+                                        <span>{{patience.documentType}}{{' ' + patience.docNumber}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty"style="display: inline-block;">
+                                        <label for="name" class="control-label">Sexo</label>
+                                        <span>{{patience.sex == 'M' ? 'Masculino' : 'Femenino' }}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty"style="display: inline-block;">
+                                        <label for="name" class="control-label">Edad</label>
+                                        <span>{{patience.age}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty"style="display: inline-block;">
+                                        <label for="name" class="control-label">Domicilio</label>
+                                        <span>{{patience.street + ' ' + patience.addressNumber + ', ' + patience.neighborhood + ', CP ' + patience.postalCode}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty"style="display: inline-block;">
+                                        <label for="name" class="control-label">Fecha de Nacimiento</label>
+                                        <span>{{patience.birthDay}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty"style="display: inline-block;">
+                                        <label for="name" class="control-label">¿Tiene CIPE?</label>
+                                        <span>{{patience.csn ? 'SI' : 'NO'}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty"style="display: inline-block;">
+                                        <label for="name" class="control-label">Obra Social</label>
+                                        <span *ngIf="patience.socialSecurity">{{patience.socialSecurity.descOs}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty"style="display: inline-block;">
+                                        <label for="name" class="control-label">Alergias</label>
+                                        <span>{{patience.allergies}}</span>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!patience.email " style="display: inline-block;">
+                                        <label for="schedule" class="control-label">E-mail</label>
+                                        <input type="email" id="schedule" name="schedule" [(ngModel)]="patience.email" #schedule="ngModel" class="form-control" size="65" required>
+                                        <div *ngIf="schedule.invalid && (schedule.dirty || schedule.touched)" class="alert alert-danger">
+                                            <div *ngIf="schedule.errors.required">
+                                                E-mail es requerido.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" [class.label-floating]="!patience.phone" style="display: inline-block;">
+                                        <label for="phone" class="control-label">Teléfono</label>
+                                        <input type="text" id="phone" name="phone" [(ngModel)]="patience.phone" #phone="ngModel" class="form-control" size="65" required>
+                                        <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" class="alert alert-danger">
+                                            <div *ngIf="phone.errors.required">
+                                                Teléfono es requerido.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="form-row">
+                                    <div class="form-group form-black is-empty" style="display: inline-block;">
+                                        <label for="phone" class="control-label">Centro de Salud</label>
+                                        <div class="dropdown">
+                                            <button href="#pablo" class="dropdown-toggle btn btn-primary btn-round btn-block" style="padding-right: 90px;" data-toggle="dropdown">{{patience.healthCenter ? patience.healthCenter.name : 'Seleccione'}}
+                                                <b class="caret"></b>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-left">
+                                                <li *ngFor="let h of healthCenters">
+                                                    <div (click)="changeHealthCenter(h)">{{h.name}}</div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul> 
+                            <div class="form-row">
+                                <button type="submit" class="btn btn-primary" style="margin-top: 40px;">Guardar Cambios</button>
+                                <button type="button" class="btn" style="margin-top: 40px;" (click)="close()">Cancelar</button>
+                            </div>
+                        </form>                  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

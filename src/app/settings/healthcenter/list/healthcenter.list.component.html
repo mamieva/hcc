@@ -1,0 +1,54 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="black" style="background-color: #555;">
+                        <i class="material-icons">local_hospital</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">Centros de Salud</h4>
+                        <button type="submit" class="btn btn-white btn-round btn-just-icon" (click)="showSearchInput = !showSearchInput">
+                            <i class="material-icons">search</i>
+                            <div class="ripple-container"></div>
+                        </button>
+                        &nbsp;&nbsp;
+                        <button class="btn btn-primary" (click)="newCenter()">Nuevo Centro</button>
+                        <div style="margin-top: 0px;" *ngIf="showSearchInput">
+                            <input placeholder="Buscar..." class="form-control" name="search" [(ngModel)]="model.search" #search="ngModel" size="50" (keyup)="filterList($event)">
+                        </div>
+                        <div style="float: right;" *ngIf="searchResult.page && searchResult.page.totalElements > 0">
+                            {{getPagingInfo()}}
+                            &nbsp;
+                            <div (click)="moveToPage(-1)" class="aprevnext">&#8249;</div>
+                            <div (click)="moveToPage(1)" class="aprevnext">&#8250;</div>
+                        </div>
+                        <table class="table table-hover">
+                            <thead>
+                                <th>Nombre</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Localidad</th>
+                                <th>Habilitado</th>
+                                <th>Horario de Atención</th>
+                                <th>Acción</th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of searchResultFiltered.content" style="cursor: pointer;">
+                                    <td (click)="openRow(row.id)">{{row.name}}</td>
+                                    <td (click)="openRow(row.id)">{{row.address}}</td>
+                                    <td (click)="openRow(row.id)">{{row.phone}}</td>
+                                    <td (click)="openRow(row.id)">{{row.city ? row.city.name : ''}}</td>
+                                    <td (click)="openRow(row.id)">{{row.status == 'ACT' ? 'SI' : 'NO'}}</td>
+                                    <td (click)="openRow(row.id)">{{row.workingHours}}</td>
+                                    <td><i style="color: #f56262;" class="material-icons" (click)="deleteRow(row)">delete<span class="tooltiptext">Eliminar</span></i></td>
+                                </tr>
+                                <tr *ngIf="!searchResultFiltered.content || searchResultFiltered.content.length == 0" style="text-align: center;"><td colspan="7">No se encontraron centros de salud</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
